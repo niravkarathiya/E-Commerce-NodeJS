@@ -6,8 +6,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import authRoute from './routes/auth/auth.route';
+import { engine } from 'express-handlebars';
+import path from 'path';
 
 const app = express();
+
+app.engine("handlebars", engine({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+app.set("views", path.join(__dirname, "./templates"));
 
 // Middleware
 app.use(cors());

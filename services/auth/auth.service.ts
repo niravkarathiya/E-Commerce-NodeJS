@@ -4,6 +4,9 @@ import jwt from 'jsonwebtoken';
 import User from '../../models/user.model';
 import transport from '../../middlewares/auth/sendMail.middleware';
 import { doHash, doHashValidation, hmacProcess } from '../../utils/hashing';
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
 
 class AuthService {
     //Registration 
@@ -39,7 +42,8 @@ class AuthService {
     }
 
     //Send verfication code to email address
-    async sendVerificationCode(email: string) {
+    async sendVerificationCode(req: any) {
+        const { email } = req.body;
         const existingUser = await User.findOne({ email });
         if (!existingUser) {
             return { success: false, message: 'User does not exists!' };
@@ -47,15 +51,19 @@ class AuthService {
         if (existingUser.verified) {
             return { success: false, message: 'Your are already verified!' };
         }
-        const verificationCode = Math.floor(Math.random() * 1000000).toString();
+        const emailTemplateSource = fs.readFileSync(path.join('./templates/send-verification-code.hbs'), "utf8");
+        const template = handlebars.compile(emailTemplateSource);
+        req.body.verificationCode = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
+        const htmlToSend = template({ data: req.body })
+
         let info = await transport.sendMail({
             from: process.env.EMAIL,
             to: existingUser.email,
             subject: 'Verify Account',
-            html: '<h1>' + verificationCode + '</h1>'
+            html: htmlToSend
         });
         if (info.accepted[0] === existingUser.email) {
-            const hashedCodeValue = hmacProcess(verificationCode, process.env.HMAC_CODE_SECRET);
+            const hashedCodeValue = hmacProcess(req.body.verificationCode, process.env.HMAC_CODE_SECRET);
             existingUser.verificationCode = hashedCodeValue;
             existingUser.verificationCodeValidation = Date.now();
             await existingUser.save();
@@ -123,20 +131,28 @@ class AuthService {
     }
 
     // Send code to email address if password has forgot
-    async sendForgotPasswordCode(email: string) {
+    async sendForgotPasswordCode(req: any) {
+        const { email } = req.body;
+
         const existingUser = await User.findOne({ email }).select('+password');
         if (!existingUser) {
             return { success: false, message: 'User does not exists!' };
         }
-        const verificationCode = Math.floor(Math.random() * 1000000).toString();
+
+        const emailTemplateSource = fs.readFileSync(path.join('./templates/send-forgot-password-code.hbs'), "utf8");
+        const template = handlebars.compile(emailTemplateSource);
+        req.body.verificationCode = Math.floor(Math.random() * (999999 - 100000 + 1) + 100000).toString();
+        const htmlToSend = template({ data: req.body })
+
         let info = await transport.sendMail({
             from: process.env.EMAIL,
             to: existingUser.email,
             subject: 'Forgot Password',
-            html: '<h1>' + verificationCode + '</h1>'
+            html: htmlToSend
         });
+
         if (info.accepted[0] === existingUser.email) {
-            const hashedCodeValue = hmacProcess(verificationCode, process.env.HMAC_CODE_SECRET);
+            const hashedCodeValue = hmacProcess(req.body.verificationCode, process.env.HMAC_CODE_SECRET);
             existingUser.forgotPasswordCode = hashedCodeValue;
             existingUser.forgotPasswordCodeValidation = Date.now();
             await existingUser.save();

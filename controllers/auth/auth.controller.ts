@@ -50,16 +50,14 @@ class AuthController {
 
     //send verification code
     async sendVerificationCode(req: Request, res: Response) {
-        const { email } = req.body;
         try {
-            const result = await authService.sendVerificationCode(email);
+            const result = await authService.sendVerificationCode(req);
 
             res.json({
                 success: result.success,
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 400,
-                status: result.success ? 'success' : 'error',
             });
         } catch (error) {
             res.json({
@@ -67,7 +65,6 @@ class AuthController {
                 message: 'Internal Server Error',
                 data: [],
                 statusCode: 500,
-                status: 'error',
             });
         }
     }
@@ -82,7 +79,6 @@ class AuthController {
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 400,
-                status: result.success ?? false,
             });
         } catch (error) {
             res.status(500).json({
@@ -90,7 +86,6 @@ class AuthController {
                 message: 'Internal Server Error',
                 data: [],
                 statusCode: 500,
-                status: false,
             });
         }
     }
@@ -106,7 +101,6 @@ class AuthController {
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 401,
-                status: result.success ? 'success' : 'error',
             });
         } catch (error) {
             console.error('Error in changePassword controller:', error);
@@ -115,22 +109,19 @@ class AuthController {
                 message: 'Internal Server Error',
                 data: [],
                 statusCode: 500,
-                status: 'error',
             });
         }
     }
 
     //send forgot password code
     async sendForgotCode(req: Request, res: Response) {
-        const { email } = req.body;
         try {
-            const result = await authService.sendForgotPasswordCode(email);
+            const result = await authService.sendForgotPasswordCode(req);
             res.json({
                 success: result.success,
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 400,
-                status: result.success ? 'success' : 'error',
             });
         } catch (error) {
             res.json({
@@ -138,7 +129,6 @@ class AuthController {
                 message: 'Internal Server Error',
                 data: [],
                 statusCode: 500,
-                status: 'error',
             });
         }
     }
@@ -153,7 +143,6 @@ class AuthController {
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 400,
-                status: result.success ?? false,
             });
         } catch (error) {
             res.status(500).json({
@@ -161,7 +150,6 @@ class AuthController {
                 message: 'Internal Server Error',
                 data: [],
                 statusCode: 500,
-                status: false,
             });
         }
     }

@@ -2,9 +2,68 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../../services/auth/auth.service';
 
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     RegisterRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: user@example.com
+ *         password:
+ *           type: string
+ *           example: strongpassword123
+ *     LoginResponse:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *         token:
+ *           type: string
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: API for user authentication and authorization
+ */
 class AuthController {
 
-    // User Registration
+    /**
+   * @swagger
+   * /auth/register:
+   *   post:
+   *     summary: Register a new user
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/RegisterRequest'
+   *     responses:
+   *       201:
+   *         description: User registered successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 statusCode:
+   *                   type: integer
+   *                 message:
+   *                   type: string
+   *                   example: User registered successfully
+   *                 status:
+   *                   type: boolean
+   */
     async register(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
@@ -25,7 +84,33 @@ class AuthController {
         }
     }
 
-    // User Login
+    /**
+     * @swagger
+     * /auth/login:
+     *   post:
+     *     summary: Login a user
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               email:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Login successful
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/LoginResponse'
+     *       401:
+     *         description: Login failed
+     */
     async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
@@ -49,7 +134,16 @@ class AuthController {
         }
     }
 
-    //send verification code
+    /**
+     * @swagger
+     * /auth/send-verification-code:
+     *   post:
+     *     summary: Send a verification code to the user's email
+     *     tags: [Auth]
+     *     responses:
+     *       200:
+     *         description: Verification code sent
+     */
     async sendVerificationCode(req: Request, res: Response) {
         try {
             const result = await authService.sendVerificationCode(req);
@@ -70,7 +164,27 @@ class AuthController {
         }
     }
 
-    //verify verification code 
+    /**
+     * @swagger
+     * /auth/verify-verification-code:
+     *   post:
+     *     summary: Verify the verification code for an email
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               email:
+     *                 type: string
+     *               providedCode:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Verification successful
+     */
     async verifyVerificationCode(req: Request, res: Response) {
         const { email, providedCode } = req.body; // Get the email and provided verification code from request body
         try {
@@ -91,7 +205,27 @@ class AuthController {
         }
     }
 
-    //reset password
+    /**
+     * @swagger
+     * /auth/change-password:
+     *   post:
+     *     summary: Change the user's password
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               oldPassword:
+     *                 type: string
+     *               newPassword:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Password changed successfully
+     */
     async changePassword(req: any, res: any) {
         const { userId, verified } = req.user;
         const { oldPassword, newPassword } = req.body;
@@ -114,7 +248,16 @@ class AuthController {
         }
     }
 
-    //send forgot password code
+    /**
+      * @swagger
+      * /auth/send-forgot-code:
+      *   post:
+      *     summary: Send a forgot password code
+      *     tags: [Auth]
+      *     responses:
+      *       200:
+      *         description: Forgot password code sent
+      */
     async sendForgotCode(req: Request, res: Response) {
         try {
             const result = await authService.sendForgotPasswordCode(req);
@@ -134,7 +277,29 @@ class AuthController {
         }
     }
 
-    //verify forgot password code
+    /**
+     * @swagger
+     * /auth/verify-forgot-code:
+     *   post:
+     *     summary: Verify the forgot password code and reset password
+     *     tags: [Auth]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               email:
+     *                 type: string
+     *               providedCode:
+     *                 type: string
+     *               newPassword:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Password reset successful
+     */
     async verifyForgotPasswordCode(req: Request, res: Response) {
         const { email, providedCode, newPassword } = req.body;
         try {

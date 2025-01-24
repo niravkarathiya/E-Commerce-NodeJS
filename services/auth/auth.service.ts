@@ -14,7 +14,7 @@ class AuthService {
     async registerUser(email: string, password: string) {
         const existingUser = await User.findOne({ email });
 
-        const { error, value } = registerSchema.validate({ email, password });
+        const { error } = registerSchema.validate({ email, password });
         if (error) {
             throw new Error(error.details[0].message);
         }
@@ -34,7 +34,7 @@ class AuthService {
     async loginUser(email: string, password: string) {
         const user = await User.findOne({ email });
 
-        const { error, value } = loginSchema.validate({ email, password });
+        const { error } = loginSchema.validate({ email, password });
         if (error) {
             throw new Error(error.details[0].message);
         }
@@ -90,7 +90,7 @@ class AuthService {
         const code = providedCode.toString();
         const existingUser = await User.findOne({ email });
 
-        const { error, value } = verificationCodeSchema.validate({ email, providedCode });
+        const { error } = verificationCodeSchema.validate({ email, providedCode });
         if (error) {
             return { success: false, message: error.details[0].message, statusCode: 401 };
         }
@@ -126,7 +126,7 @@ class AuthService {
     // Reset password
     async changePassword(userId: string, verified: boolean, oldPassword: string, newPassword: string) {
         try {
-            const { error, value } = changePasswordSchema.validate({ oldPassword, newPassword });
+            const { error } = changePasswordSchema.validate({ oldPassword, newPassword });
             if (error) {
                 return { success: false, message: error.details[0].message, statusCode: 401 };
             }
@@ -187,7 +187,7 @@ class AuthService {
     async verifyForgotPasswordCode(email: string, providedCode: any, newPassword: string) {
         const code = providedCode.toString();
         const existingUser = await User.findOne({ email }).select('+forgotPasswordCode +forgotPasswordCodeValidation');
-        const { error, value } = verifyForgotPasswordSchema.validate({ email, providedCode, newPassword });
+        const { error } = verifyForgotPasswordSchema.validate({ email, providedCode, newPassword });
         if (error) {
             return { success: false, message: error.details[0].message, statusCode: 401 };
         }

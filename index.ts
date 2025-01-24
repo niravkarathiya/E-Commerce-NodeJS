@@ -9,8 +9,15 @@ import mongoose from 'mongoose';
 import authRoute from './routes/auth/auth.route';
 import { engine } from 'express-handlebars';
 import path from 'path';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerOptions } from './swagger.config';
 
 const app = express();
+
+// Swagger setup
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");

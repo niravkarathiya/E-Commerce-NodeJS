@@ -9,10 +9,11 @@ class AuthController {
         const { email, password } = req.body;
         try {
             const newUser = await authService.registerUser(email, password);
+
             res.json({
                 statusCode: 201,
                 message: 'User registered successfully',
-                data: { email: newUser.email },
+                data: { email: newUser?.email },
                 status: true,
             })
         } catch (error: any) {
@@ -36,7 +37,7 @@ class AuthController {
             }).json({
                 statusCode: 200,
                 message: 'Login successful',
-                data: { email: user.email, token },
+                data: { email: user?.email, token },
                 status: true,
             })
         } catch (error: any) {

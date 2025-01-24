@@ -4,12 +4,7 @@ import { NextFunction } from 'express';
 export const loggedIn = (req: any, res: any, next: NextFunction) => {
     try {
         let token: string | undefined;
-
-        if (req.headers.client === 'not-browser') {
-            token = req.headers.authorization; // From authorization header
-        } else {
-            token = req.cookies['Authorization']; // From cookies
-        }
+        token = req.headers.authorization // From cookies
 
         if (!token) {
             return res.status(403).json({ success: false, message: 'Unauthorized!' });
@@ -26,7 +21,6 @@ export const loggedIn = (req: any, res: any, next: NextFunction) => {
 
         throw new Error('Invalid token!');
     } catch (error) {
-        console.error('Token verification error:', error);
-        return res.status(403).json({ success: false, message: 'Unauthorized!' });
+        return res.status(403).json({ success: false, message: error });
     }
 };

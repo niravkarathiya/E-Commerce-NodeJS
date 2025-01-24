@@ -1,17 +1,23 @@
-// services/auth.service.ts
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user.model';
-import transport from '../../middlewares/auth/sendMail.middleware';
+import transport from '../../utils/sendMail';
 import { doHash, doHashValidation, hmacProcess } from '../../utils/hashing';
 import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
+import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchema, loginSchema, registerSchema } from "../../utils/validators";
 
 class AuthService {
+
     //Registration 
     async registerUser(email: string, password: string) {
         const existingUser = await User.findOne({ email });
+
+        const { error, value } = registerSchema.validate({ email, password });
+        if (error) {
+            throw new Error(error.details[0].message);
+        }
         if (existingUser) {
             throw new Error('User already exists!');
         }
@@ -27,6 +33,12 @@ class AuthService {
     //Login
     async loginUser(email: string, password: string) {
         const user = await User.findOne({ email });
+
+        const { error, value } = loginSchema.validate({ email, password });
+        if (error) {
+            throw new Error(error.details[0].message);
+        }
+
         if (!user) {
             throw new Error('Invalid email or password');
         }
@@ -78,6 +90,11 @@ class AuthService {
         const code = providedCode.toString();
         const existingUser = await User.findOne({ email });
 
+        const { error, value } = verificationCodeSchema.validate({ email, providedCode });
+        if (error) {
+            return { success: false, message: error.details[0].message, statusCode: 401 };
+        }
+
         if (!existingUser) {
             return { success: false, message: 'User does not exists!' };
         }
@@ -109,6 +126,11 @@ class AuthService {
     // Reset password
     async changePassword(userId: string, verified: boolean, oldPassword: string, newPassword: string) {
         try {
+            const { error, value } = changePasswordSchema.validate({ oldPassword, newPassword });
+            if (error) {
+                return { success: false, message: error.details[0].message, statusCode: 401 };
+            }
+
             if (!verified) {
                 return { success: false, message: 'You are not a verified user!' };
             }
@@ -165,6 +187,10 @@ class AuthService {
     async verifyForgotPasswordCode(email: string, providedCode: any, newPassword: string) {
         const code = providedCode.toString();
         const existingUser = await User.findOne({ email }).select('+forgotPasswordCode +forgotPasswordCodeValidation');
+        const { error, value } = verifyForgotPasswordSchema.validate({ email, providedCode, newPassword });
+        if (error) {
+            return { success: false, message: error.details[0].message, statusCode: 401 };
+        }
         if (!existingUser) {
             return { success: false, message: 'User does not exists!' };
         }

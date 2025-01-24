@@ -26,6 +26,52 @@ import { authService } from '../../services/auth/auth.service';
  *           type: string
  *         token:
  *           type: string
+ *     SendVerificationCodeRequest:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: user@example.com
+ *     VerifyVerificationCodeRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - providedCode
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: user@example.com
+ *         providedCode:
+ *           type: string
+ *           example: 123456
+ *     ChangePasswordRequest:
+ *       type: object
+ *       required:
+ *         - oldPassword
+ *         - newPassword
+ *       properties:
+ *         oldPassword:
+ *           type: string
+ *           example: oldpassword123
+ *         newPassword:
+ *           type: string
+ *           example: newpassword456
+ *     VerifyForgotPasswordRequest:
+ *       type: object
+ *       required:
+ *         - email
+ *         - providedCode
+ *         - newPassword
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: user@example.com
+ *         providedCode:
+ *           type: string
+ *           example: 123456
+ *         newPassword:
+ *           type: string
+ *           example: newpassword456
  */
 
 /**
@@ -135,15 +181,44 @@ class AuthController {
     }
 
     /**
-     * @swagger
-     * /auth/send-verification-code:
-     *   post:
-     *     summary: Send a verification code to the user's email
-     *     tags: [Auth]
-     *     responses:
-     *       200:
-     *         description: Verification code sent
-     */
+ * @swagger
+ * /auth/send-verification-code:
+ *   post:
+ *     summary: Send a verification code to the user's email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Verification code sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 statusCode:
+ *                   type: integer
+ *       400:
+ *         description: Failed to send verification code
+ *       500:
+ *         description: Internal Server Error
+ */
     async sendVerificationCode(req: Request, res: Response) {
         try {
             const result = await authService.sendVerificationCode(req);
@@ -165,28 +240,49 @@ class AuthController {
     }
 
     /**
-     * @swagger
-     * /auth/verify-verification-code:
-     *   post:
-     *     summary: Verify the verification code for an email
-     *     tags: [Auth]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               email:
-     *                 type: string
-     *               providedCode:
-     *                 type: string
-     *     responses:
-     *       200:
-     *         description: Verification successful
-     */
+  * @swagger
+  * /auth/verify-verification-code:
+  *   post:
+  *     summary: Verify the verification code for an email
+  *     tags: [Auth]
+  *     requestBody:
+  *       required: true
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+  *               email:
+  *                 type: string
+  *                 example: user@example.com
+  *               providedCode:
+  *                 type: string
+  *                 example: 123456
+  *     responses:
+  *       200:
+  *         description: Verification successful
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 success:
+  *                   type: boolean
+  *                 message:
+  *                   type: string
+  *                 data:
+  *                   type: array
+  *                   items:
+  *                     type: object
+  *                 statusCode:
+  *                   type: integer
+  *       400:
+  *         description: Verification failed
+  *       500:
+  *         description: Internal Server Error
+  */
     async verifyVerificationCode(req: Request, res: Response) {
-        const { email, providedCode } = req.body; // Get the email and provided verification code from request body
+        const { email, providedCode } = req.body;
         try {
             const result = await authService.verifVerificationCode(email, providedCode);
             res.status(result.success ? 200 : 400).json({
@@ -204,6 +300,7 @@ class AuthController {
             });
         }
     }
+
 
     /**
      * @swagger
@@ -249,15 +346,44 @@ class AuthController {
     }
 
     /**
-      * @swagger
-      * /auth/send-forgot-code:
-      *   post:
-      *     summary: Send a forgot password code
-      *     tags: [Auth]
-      *     responses:
-      *       200:
-      *         description: Forgot password code sent
-      */
+ * @swagger
+ * /auth/send-forgot-password-code:
+ *   post:
+ *     summary: Send a forgot password code to the user's email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Forgot password code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 statusCode:
+ *                   type: integer
+ *       400:
+ *         description: Failed to send forgot password code
+ *       500:
+ *         description: Internal Server Error
+ */
     async sendForgotCode(req: Request, res: Response) {
         try {
             const result = await authService.sendForgotPasswordCode(req);
@@ -277,9 +403,10 @@ class AuthController {
         }
     }
 
+
     /**
      * @swagger
-     * /auth/verify-forgot-code:
+     * /auth/verify-forgot-password-code:
      *   post:
      *     summary: Verify the forgot password code and reset password
      *     tags: [Auth]

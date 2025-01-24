@@ -10,10 +10,10 @@ export const swaggerOptions: SwaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:8000/api', // Replace with your API base URL
+                url: 'http://localhost:8000/',
                 description: 'Development server',
             },
         ],
     },
-    apis: ['./controllers/auth/*.ts'], // Path to the controller files with Swagger annotations
+    apis: ['./controllers/auth/*.ts'],
 };

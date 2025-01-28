@@ -31,7 +31,7 @@ class ProductController {
             res.status(200).json({
                 statusCode: 200,
                 message: 'Products retrieved successfully',
-                data: products,
+                data: products.products || [],
                 status: true,
             });
         } catch (error) {

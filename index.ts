@@ -9,8 +9,8 @@ import mongoose from 'mongoose';
 import authRoute from './routes/auth/auth.route';
 import { engine } from 'express-handlebars';
 import path from 'path';
-import swaggerJsDoc from 'swagger-jsdoc';
 import productRoute from './routes/product/product.route';
+import reviewRoute from './routes/reviews/reviews.route';
 
 const app = express();
 
@@ -34,6 +34,7 @@ mongoose.connect(process.env.DB_URI as string).then(() => {
 
 app.use('/auth', authRoute);
 app.use('/products', productRoute);
+app.use('/review', reviewRoute);
 
 // Routes
 app.get('/', (req: Request, res: Response) => {

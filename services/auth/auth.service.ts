@@ -46,7 +46,7 @@ class AuthService {
         if (!isPasswordCorrect) {
             throw new Error('Invalid email or password');
         }
-        const token = jwt.sign({ userId: user._id, email: user.email, verified: user.verified }, process.env.TOKEN_SECRET as string, { expiresIn: '8h' });
+        const token = jwt.sign({ _id: user._id, email: user.email, verified: user.verified }, process.env.TOKEN_SECRET as string, { expiresIn: '8h' });
         return {
             user,
             token,

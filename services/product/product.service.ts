@@ -12,7 +12,7 @@ class ProductService {
 
         const newProduct = new Product(data);
         await newProduct.save();
-        return { success: true, message: 'Product created successfully!', product: newProduct };
+        return { message: 'Product created successfully!', product: newProduct };
     }
 
     // Fetch a single product by ID
@@ -21,7 +21,7 @@ class ProductService {
         if (!product) {
             throw new Error('Product not found!');
         }
-        return { success: true, product };
+        return { product };
     }
 
     // Fetch all products with optional filters, pagination, and sorting
@@ -33,7 +33,6 @@ class ProductService {
 
         const totalCount = await Product.countDocuments(filters);
         return {
-            success: true,
             products,
             totalCount,
             page,
@@ -53,7 +52,7 @@ class ProductService {
             throw new Error('Product not found!');
         }
 
-        return { success: true, message: 'Product updated successfully!', product: updatedProduct };
+        return { message: 'Product updated successfully!', product: updatedProduct };
     }
 
     // Delete product by ID
@@ -62,7 +61,7 @@ class ProductService {
         if (!deletedProduct) {
             throw new Error('Product not found!');
         }
-        return { success: true, message: 'Product deleted successfully!', product: deletedProduct };
+        return { message: 'Product deleted successfully!', product: deletedProduct };
     }
 
 }

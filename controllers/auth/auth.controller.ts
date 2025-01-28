@@ -2,114 +2,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../../services/auth/auth.service';
 
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     RegisterRequest:
- *       type: object
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           example: user@example.com
- *         password:
- *           type: string
- *           example: strongpassword123
- *     LoginResponse:
- *       type: object
- *       properties:
- *         email:
- *           type: string
- *         token:
- *           type: string
- *     SendVerificationCodeRequest:
- *       type: object
- *       properties:
- *         email:
- *           type: string
- *           example: user@example.com
- *     VerifyVerificationCodeRequest:
- *       type: object
- *       required:
- *         - email
- *         - providedCode
- *       properties:
- *         email:
- *           type: string
- *           example: user@example.com
- *         providedCode:
- *           type: string
- *           example: 123456
- *     ChangePasswordRequest:
- *       type: object
- *       required:
- *         - oldPassword
- *         - newPassword
- *       properties:
- *         oldPassword:
- *           type: string
- *           example: oldpassword123
- *         newPassword:
- *           type: string
- *           example: newpassword456
- *     VerifyForgotPasswordRequest:
- *       type: object
- *       required:
- *         - email
- *         - providedCode
- *         - newPassword
- *       properties:
- *         email:
- *           type: string
- *           example: user@example.com
- *         providedCode:
- *           type: string
- *           example: 123456
- *         newPassword:
- *           type: string
- *           example: newpassword456
- */
-
-/**
- * @swagger
- * tags:
- *   name: Auth
- *   description: API for user authentication and authorization
- */
 class AuthController {
 
-    /**
-   * @swagger
-   * /auth/register:
-   *   post:
-   *     summary: Register a new user
-   *     tags: [Auth]
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/RegisterRequest'
-   *     responses:
-   *       201:
-   *         description: User registered successfully
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 statusCode:
-   *                   type: integer
-   *                 message:
-   *                   type: string
-   *                   example: User registered successfully
-   *                 status:
-   *                   type: boolean
-   */
+
     async register(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
@@ -130,33 +25,7 @@ class AuthController {
         }
     }
 
-    /**
-     * @swagger
-     * /auth/login:
-     *   post:
-     *     summary: Login a user
-     *     tags: [Auth]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               email:
-     *                 type: string
-     *               password:
-     *                 type: string
-     *     responses:
-     *       200:
-     *         description: Login successful
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/LoginResponse'
-     *       401:
-     *         description: Login failed
-     */
+
     async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
@@ -180,45 +49,7 @@ class AuthController {
         }
     }
 
-    /**
- * @swagger
- * /auth/send-verification-code:
- *   post:
- *     summary: Send a verification code to the user's email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: user@example.com
- *     responses:
- *       200:
- *         description: Verification code sent
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                 statusCode:
- *                   type: integer
- *       400:
- *         description: Failed to send verification code
- *       500:
- *         description: Internal Server Error
- */
+
     async sendVerificationCode(req: Request, res: Response) {
         try {
             const result = await authService.sendVerificationCode(req);
@@ -239,48 +70,7 @@ class AuthController {
         }
     }
 
-    /**
-  * @swagger
-  * /auth/verify-verification-code:
-  *   post:
-  *     summary: Verify the verification code for an email
-  *     tags: [Auth]
-  *     requestBody:
-  *       required: true
-  *       content:
-  *         application/json:
-  *           schema:
-  *             type: object
-  *             properties:
-  *               email:
-  *                 type: string
-  *                 example: user@example.com
-  *               providedCode:
-  *                 type: string
-  *                 example: 123456
-  *     responses:
-  *       200:
-  *         description: Verification successful
-  *         content:
-  *           application/json:
-  *             schema:
-  *               type: object
-  *               properties:
-  *                 success:
-  *                   type: boolean
-  *                 message:
-  *                   type: string
-  *                 data:
-  *                   type: array
-  *                   items:
-  *                     type: object
-  *                 statusCode:
-  *                   type: integer
-  *       400:
-  *         description: Verification failed
-  *       500:
-  *         description: Internal Server Error
-  */
+
     async verifyVerificationCode(req: Request, res: Response) {
         const { email, providedCode } = req.body;
         try {
@@ -302,27 +92,7 @@ class AuthController {
     }
 
 
-    /**
-     * @swagger
-     * /auth/change-password:
-     *   post:
-     *     summary: Change the user's password
-     *     tags: [Auth]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               oldPassword:
-     *                 type: string
-     *               newPassword:
-     *                 type: string
-     *     responses:
-     *       200:
-     *         description: Password changed successfully
-     */
+
     async changePassword(req: any, res: any) {
         const { userId, verified } = req.user;
         const { oldPassword, newPassword } = req.body;
@@ -345,45 +115,6 @@ class AuthController {
         }
     }
 
-    /**
- * @swagger
- * /auth/send-forgot-password-code:
- *   post:
- *     summary: Send a forgot password code to the user's email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: user@example.com
- *     responses:
- *       200:
- *         description: Forgot password code sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                 statusCode:
- *                   type: integer
- *       400:
- *         description: Failed to send forgot password code
- *       500:
- *         description: Internal Server Error
- */
     async sendForgotCode(req: Request, res: Response) {
         try {
             const result = await authService.sendForgotPasswordCode(req);
@@ -403,30 +134,6 @@ class AuthController {
         }
     }
 
-
-    /**
-     * @swagger
-     * /auth/verify-forgot-password-code:
-     *   post:
-     *     summary: Verify the forgot password code and reset password
-     *     tags: [Auth]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               email:
-     *                 type: string
-     *               providedCode:
-     *                 type: string
-     *               newPassword:
-     *                 type: string
-     *     responses:
-     *       200:
-     *         description: Password reset successful
-     */
     async verifyForgotPasswordCode(req: Request, res: Response) {
         const { email, providedCode, newPassword } = req.body;
         try {
@@ -436,6 +143,25 @@ class AuthController {
                 message: result.message,
                 data: [],
                 statusCode: result.success ? 200 : 400,
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Internal Server Error',
+                data: [],
+                statusCode: 500,
+            });
+        }
+    }
+
+    async signOut(req: Request, res: Response) {
+
+        try {
+            res.clearCookie('Authorization').status(200).json({
+                success: true,
+                message: 'Logged out successfully!',
+                data: [],
+                statusCode: 200,
             });
         } catch (error) {
             res.status(500).json({

@@ -10,14 +10,9 @@ import authRoute from './routes/auth/auth.route';
 import { engine } from 'express-handlebars';
 import path from 'path';
 import swaggerJsDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import { swaggerOptions } from './swagger.config';
+import productRoute from './routes/product/product.route';
 
 const app = express();
-
-// Swagger setup
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.engine("handlebars", engine({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -38,6 +33,7 @@ mongoose.connect(process.env.DB_URI as string).then(() => {
 });
 
 app.use('/auth', authRoute);
+app.use('/products', productRoute);
 
 // Routes
 app.get('/', (req: Request, res: Response) => {

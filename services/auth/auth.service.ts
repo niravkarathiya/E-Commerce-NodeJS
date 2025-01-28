@@ -6,7 +6,7 @@ import { doHash, doHashValidation, hmacProcess } from '../../utils/hashing';
 import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
-import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchema, loginSchema, registerSchema } from "../../utils/validators";
+import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchema, loginSchema, registerSchema } from "../../utils/auth.validators";
 
 class AuthService {
 
@@ -211,7 +211,6 @@ class AuthService {
         }
         return { success: false, message: 'Something went wrong!' };
     }
-
 }
 
 export const authService = new AuthService();

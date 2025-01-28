@@ -26,4 +26,7 @@ authRouter.patch('/send-forgot-password-code', authController.sendForgotCode);
 // Verifying the that been sent to the email address for forgot password
 authRouter.patch('/verify-forgot-password-code', authController.verifyForgotPasswordCode);
 
+//log out if user is already logged in
+authRouter.post('sign-out', loggedIn, authController.signOut);
+
 export default authRouter;

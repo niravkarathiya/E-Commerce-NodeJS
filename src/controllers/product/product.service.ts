@@ -1,5 +1,5 @@
-import Product from '../../models/product.model';
-import { productSchema } from '../../utils/product.validator';
+import Product from './product.model';
+import { productSchema } from './product.validator';
 
 class ProductService {
 

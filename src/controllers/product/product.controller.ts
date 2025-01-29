@@ -1,6 +1,6 @@
 // controllers/product.controller.ts
 import { Request, Response, NextFunction } from 'express';
-import { productService } from '../../services/product/product.service';
+import { productService } from './product.service';
 
 
 class ProductController {

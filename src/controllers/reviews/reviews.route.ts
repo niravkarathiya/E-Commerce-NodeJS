@@ -1,7 +1,7 @@
 // routes/reviews.routes.ts
 import { Router } from 'express';
-import { loggedIn } from '../../middlewares/auth/auth.middleware';
-import { reviewController } from '../../controllers/reviews/reviews.controller';
+import { loggedIn } from '../../middlewares/auth.middleware';
+import { reviewController } from './reviews.controller';
 
 const reviewRoute = Router();
 

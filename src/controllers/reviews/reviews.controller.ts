@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { productService } from '../../services/product/product.service'; // For product existence check
-import { reviewService } from '../../services/reviews/review.service';
+import { productService } from '../product/product.service'; // For product existence check
+import { reviewService } from './review.service';
 
 class ReviewController {
 

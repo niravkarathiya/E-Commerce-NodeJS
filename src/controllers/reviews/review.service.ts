@@ -1,5 +1,5 @@
-import Review from "../../models/reviews.model";
-import { reviewSchema } from "../../utils/review.validator";
+import Review from "./reviews.model";
+import { reviewSchema } from "./review.validator";
 
 class ReviewService {
 

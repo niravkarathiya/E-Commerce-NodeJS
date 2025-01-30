@@ -50,14 +50,14 @@ const purchaseSchema = new Schema({
         enum: ['Paid', 'Pending', 'Failed', 'Refunded'],
     },
     shippingAddress: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
         required: [true, 'Shipping address is required!'],
-        trim: true,
     },
     billingAddress: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
         required: [true, 'Billing address is required!'],
-        trim: true,
     },
     orderStatus: {
         type: String,

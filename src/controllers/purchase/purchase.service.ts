@@ -1,4 +1,5 @@
 import { randomController } from '../../utils/generateRandom';
+import Address from '../address/address.model';
 import Product from '../product/product.model';
 import Purchase from './purchase.model';
 
@@ -22,6 +23,16 @@ class PurchaseService {
             newPurchase.totalPrice = newPurchase.products.reduce((sum, product) => {
                 return sum + (product.total ?? 0);
             }, 0);
+
+            const shippingAddress = await Address.findById(newPurchase.shippingAddress).select('_id');
+            if (shippingAddress) {
+                newPurchase.shippingAddress = shippingAddress._id;
+            }
+
+            const billingAddress = await Address.findById(newPurchase.billingAddress).select('_id');
+            if (billingAddress) {
+                newPurchase.billingAddress = billingAddress._id;
+            }
 
             await newPurchase.save();
             return { message: 'Purchase created successfully!', purchase: newPurchase };

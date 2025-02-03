@@ -16,10 +16,10 @@ import productRoute from './controllers/product/product.route';
 import reviewRoute from './controllers/reviews/reviews.route';
 import purchaseRoute from './controllers/purchase/purchase.routes';
 import addressRoute from './controllers/address/address.routes';
-import fs from "fs";
 
 //database connection
-import connectDB from './dbConnection';
+import connectDB from './utils/dbConnection';
+import logRequest from './middlewares/log.middleware';
 
 const app = express();
 
@@ -36,20 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware to log request details
-app.use((req, res, next) => {
-    const dateTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-    const ipAddress = req.headers['x-real-ip'] || req.headers['x-forwarded-for'];
-    const logMessage = `[${dateTime}] - IP: ${ipAddress} - ${req.method} ${req.originalUrl}\n`;
-
-    // Log to the log file
-    fs.appendFile(path.join(__dirname, 'log.txt'), logMessage, (err) => {
-        if (err) {
-            console.error("Error writing to log file", err);
-        }
-    });
-
-    next();
-});
+app.use(logRequest);
 
 // Database connection
 connectDB();

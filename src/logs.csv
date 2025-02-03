@@ -1,0 +1,4 @@
+Country,Date & Time,IP Address,Method,Route
+"Bengaluru, IN","3/2/2025, 6:15:44 pm",122.167.196.29,POST,/auth/login
+"Bengaluru, IN","3/2/2025, 6:16:22 pm",122.167.196.29,POST,/auth/login
+", ","3/2/2025, 6:16:42 pm",localhost,POST,/auth/register

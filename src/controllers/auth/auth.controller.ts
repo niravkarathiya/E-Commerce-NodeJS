@@ -37,7 +37,7 @@ class AuthController {
             }).json({
                 statusCode: 200,
                 message: 'Login successful',
-                data: { email: user?.email, token },
+                data: { email: user?.email, token, username: user?.username },
                 status: true,
             })
         } catch (error: any) {

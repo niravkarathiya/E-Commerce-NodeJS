@@ -27,6 +27,8 @@ authRouter.patch('/send-forgot-password-code', authController.sendForgotCode);
 authRouter.patch('/verify-forgot-password-code', authController.verifyForgotPasswordCode);
 
 //log out if user is already logged in
-authRouter.post('sign-out', loggedIn, authController.signOut);
+authRouter.post('/sign-out', loggedIn, authController.signOut);
+
+authRouter.patch('/update-profile', loggedIn, authController.updateProfile);
 
 export default authRouter;

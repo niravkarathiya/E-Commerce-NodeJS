@@ -6,9 +6,9 @@ class AuthController {
 
 
     async register(req: Request, res: Response, next: NextFunction) {
-        const { email, password } = req.body;
+        const { email, password, username } = req.body;
         try {
-            const newUser = await authService.registerUser(email, password);
+            const newUser = await authService.registerUser(email, password, username);
 
             res.json({
                 statusCode: 201,
@@ -172,6 +172,57 @@ class AuthController {
             });
         }
     }
+
+    async updateProfile(req: any, res: Response) {
+        const { _id } = req.user;
+        const { username, avatar } = req.body;
+
+        try {
+            if (!username && !avatar) {
+                res.status(400).json({
+                    success: false,
+                    message: 'No profile fields provided to update.',
+                    data: [],
+                    statusCode: 400,
+                });
+            }
+
+            // Update user information in the service layer
+            const updatedUser = await authService.updateUserProfile(_id,
+                username,
+                avatar,
+            );
+
+            if (!updatedUser) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Profile update failed.',
+                    data: [],
+                    statusCode: 400,
+                });
+            }
+
+            res.status(200).json({
+                success: true,
+                message: 'Profile updated successfully.',
+                data: {
+                    username: updatedUser?.data?.username,
+                    avatar: updatedUser?.data?.avatar,
+                },
+                statusCode: 200,
+            });
+
+        } catch (error) {
+            console.error('Error in updateProfile controller:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal Server Error',
+                data: [],
+                statusCode: 500,
+            });
+        }
+    }
+
 }
 
 export const authController = new AuthController();

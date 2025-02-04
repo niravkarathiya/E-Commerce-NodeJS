@@ -10,8 +10,11 @@ import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchem
 
 class AuthService {
 
+
+
     //Registration 
-    async registerUser(email: string, password: string) {
+    async registerUser(email: string, password: string, username: string) {
+        const defaultAvatarBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAg0B7kH4VQAAAABJRU5ErkJggg==";
         const existingUser = await User.findOne({ email });
 
         const { error } = registerSchema.validate({ email, password });
@@ -25,6 +28,8 @@ class AuthService {
         const newUser = new User({
             email,
             password: hashedPassword,
+            avatar: defaultAvatarBase64,
+            username: username
         });
         await newUser.save();
         return newUser;
@@ -211,6 +216,34 @@ class AuthService {
         }
         return { success: false, message: 'Something went wrong!' };
     }
+
+    async updateUserProfile(userId: string, username?: string, avatar?: string) {
+        try {
+            const user = await User.findById(userId);
+            if (!user) {
+                throw new Error('User not found');
+            }
+
+            if (username) user.username = username;
+
+            if (avatar) {
+                user.avatar = avatar;
+            }
+            await user.save();
+            return {
+                success: true,
+                message: 'Profile updated successfully!',
+                data: {
+                    username: user.username,
+                    avatar: user.avatar,
+                },
+            };
+        } catch (error: any) {
+            console.error('Error in updateUserProfile service:', error);
+            return { success: false, message: error.message || 'Something went wrong!' };
+        }
+    }
+
 }
 
 export const authService = new AuthService();

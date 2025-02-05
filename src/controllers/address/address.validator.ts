@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import Joi from 'joi';
 
 // Joi validation schema for Address

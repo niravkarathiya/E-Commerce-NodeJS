@@ -12,7 +12,7 @@ authRouter.post('/register', authController.register);
 authRouter.post('/login', authController.login);
 
 //Sending code for verification
-authRouter.patch('/send-verification-code', loggedIn, authController.sendVerificationCode);
+authRouter.patch('/send-verification-code', authController.sendVerificationCode);
 
 //Verifying code that been sent to email address for verification
 authRouter.patch('/verify-verification-code', loggedIn, authController.verifyVerificationCode);
@@ -30,5 +30,9 @@ authRouter.patch('/verify-forgot-password-code', authController.verifyForgotPass
 authRouter.post('/sign-out', loggedIn, authController.signOut);
 
 authRouter.patch('/update-profile', loggedIn, authController.updateProfile);
+
+// Email verification route
+authRouter.get('/verify-email', authController.verifyUserEmail);
+
 
 export default authRouter;

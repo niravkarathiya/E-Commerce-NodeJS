@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { purchaseService } from './purchase.service';
 
 class PurchaseController {
 
     // Create a new purchase
-    async createPurchase(req: Request, res: Response, next: NextFunction) {
+    async createPurchase(req: Request, res: Response) {
         try {
             const newPurchase = await purchaseService.createPurchase(req.body);
             res.json({
@@ -23,7 +23,7 @@ class PurchaseController {
     }
 
     // Get purchase by ID
-    async getPurchaseById(req: Request, res: Response, next: NextFunction) {
+    async getPurchaseById(req: Request, res: Response) {
         try {
             const purchase = await purchaseService.getPurchaseById(req.params.id);
             res.json({
@@ -42,7 +42,7 @@ class PurchaseController {
     }
 
     // Get all purchases with optional filters
-    async getPurchases(req: Request, res: Response, next: NextFunction) {
+    async getPurchases(req: Request, res: Response) {
         const { page = 1, limit = 10, sort = '{}' } = req.query;
         try {
             const purchases = await purchaseService.getPurchases({}, Number(page), Number(limit), JSON.parse(sort as string));
@@ -62,7 +62,7 @@ class PurchaseController {
     }
 
     // Update a purchase by ID
-    async updatePurchase(req: Request, res: Response, next: NextFunction) {
+    async updatePurchase(req: Request, res: Response) {
         try {
             const updatedPurchase = await purchaseService.updatePurchase(req.params.id, req.body);
             res.json({
@@ -81,7 +81,7 @@ class PurchaseController {
     }
 
     // Delete a purchase by ID
-    async deletePurchase(req: Request, res: Response, next: NextFunction) {
+    async deletePurchase(req: Request, res: Response) {
         try {
             const deletedPurchase = await purchaseService.deletePurchase(req.params.id);
             res.json({

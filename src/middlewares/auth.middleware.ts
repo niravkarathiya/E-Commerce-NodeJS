@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { NextFunction } from 'express';
 
-export const loggedIn = (req: any, res: any, next: NextFunction) => {
+export const loggedIn = (req: any, res: any, next: any) => {
     try {
         let token: string | undefined;
         token = req.headers.authorization // From cookies

@@ -5,7 +5,7 @@ import { reviewService } from './review.service';
 class ReviewController {
 
     // Create a new review
-    async createReview(req: any, res: Response, next: NextFunction) {
+    async createReview(req: any, res: Response) {
         try {
             const { productId } = req.params;
             const reviewData = {

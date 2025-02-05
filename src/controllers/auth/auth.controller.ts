@@ -1,19 +1,18 @@
 // controllers/auth.controller.ts
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { authService } from './auth.service';
 
 class AuthController {
 
 
-    async register(req: Request, res: Response, next: NextFunction) {
+    async register(req: Request, res: Response) {
         const { email, password, username } = req.body;
         try {
-            const newUser = await authService.registerUser(email, password, username);
+            const newUser = await authService.registerUserWithEmailVerify(email, password, username);
 
             res.json({
-                statusCode: 201,
-                message: 'User registered successfully',
-                data: { email: newUser?.email },
+                statusCode: newUser?.statusCode,
+                message: newUser?.message,
                 status: true,
             })
         } catch (error: any) {
@@ -25,8 +24,20 @@ class AuthController {
         }
     }
 
+    async verifyUserEmail(req: Request, res: Response): Promise<void> {
+        try {
+            const result = await authService.verifyUserEmail(req);
+            res.status(result.success ? 200 : 400).json(result);
+        } catch (error: any) {
+            res.status(500).json({
+                success: false,
+                message: 'Internal Server Error',
+            });
+        }
+    }
 
-    async login(req: Request, res: Response, next: NextFunction) {
+
+    async login(req: Request, res: Response) {
         const { email, password } = req.body;
         try {
             const { user, token } = await authService.loginUser(email, password);
@@ -101,7 +112,6 @@ class AuthController {
             res.status(result.success ? 200 : 401).json({
                 success: result.success,
                 message: result.message,
-                data: [],
                 statusCode: result.success ? 200 : 401,
             });
         } catch (error) {

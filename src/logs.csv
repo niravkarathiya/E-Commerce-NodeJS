@@ -20,3 +20,5 @@ Country,Date & Time,IP Address,Method,Route
 ", ","4/2/2025, 3:09:29 pm","localhost","PATCH","/auth/update-profile"
 ", ","4/2/2025, 3:10:06 pm","localhost","PATCH","/auth/update-profile"
 ", ","4/2/2025, 3:10:25 pm","localhost","PATCH","/auth/update-profile"
+", ","5/2/2025, 4:57:41 pm","localhost","POST","/auth/login"
+", ","5/2/2025, 4:57:52 pm","localhost","POST","/auth/login"

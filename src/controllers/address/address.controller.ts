@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { addressService } from './address.service';
+import { Error } from 'mongoose';
 
 class AddressController {
 
     // Create a new address
-    async createAddress(req: Request, res: Response, next: NextFunction) {
+    async createAddress(req: Request, res: Response) {
         try {
             const newAddress = await addressService.createAddress(req.body);
             res.json({
@@ -23,7 +24,7 @@ class AddressController {
     }
 
     // Get address by ID
-    async getAddressById(req: Request, res: Response, next: NextFunction) {
+    async getAddressById(req: Request, res: Response) {
         try {
             const address = await addressService.getAddressById(req.params.id);
             res.json({
@@ -42,7 +43,7 @@ class AddressController {
     }
 
     // Get all addresses with optional filters
-    async getAddresses(req: Request, res: Response, next: NextFunction) {
+    async getAddresses(req: Request, res: Response) {
         const { page = 1, limit = 10, sort = '{}' } = req.query;
         try {
             const addresses = await addressService.getAddresses({}, Number(page), Number(limit), JSON.parse(sort as string));
@@ -62,7 +63,7 @@ class AddressController {
     }
 
     // Update an address by ID
-    async updateAddress(req: Request, res: Response, next: NextFunction) {
+    async updateAddress(req: Request, res: Response) {
         try {
             const updatedAddress = await addressService.updateAddress(req.params.id, req.body);
             res.json({
@@ -81,7 +82,7 @@ class AddressController {
     }
 
     // Delete an address by ID
-    async deleteAddress(req: Request, res: Response, next: NextFunction) {
+    async deleteAddress(req: Request, res: Response) {
         try {
             const deletedAddress = await addressService.deleteAddress(req.params.id);
             res.json({

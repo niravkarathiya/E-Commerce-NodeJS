@@ -12,6 +12,7 @@ const generateStringMessages = (field: string, min: number, max: number) => ({
 // Password validation pattern and messages
 const passwordValidation = Joi.string()
     .required()
+    .trim()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)
     .messages({
         'string.base': 'Password must be a string.',
@@ -26,6 +27,7 @@ const generateEmailValidation = (tlds: string[] = ['com']) =>
         .min(6)
         .max(60)
         .required()
+        .trim()
         .email({ tlds: { allow: tlds } })
         .messages(generateStringMessages('Email', 6, 60));
 

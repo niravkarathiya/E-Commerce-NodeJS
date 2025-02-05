@@ -1,12 +1,12 @@
 // controllers/product.controller.ts
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { productService } from './product.service';
 
 
 class ProductController {
 
 
-    async createProduct(req: Request, res: Response, next: NextFunction) {
+    async createProduct(req: Request, res: Response) {
         try {
             const newProduct = await productService.createProduct(req.body);
             res.status(201).json({

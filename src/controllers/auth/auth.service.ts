@@ -209,8 +209,7 @@ class AuthService {
             await user.save();
             return { success: true, message: 'Profile updated successfully!', data: { username: user.username, avatar: user.avatar } };
         } catch (error: any) {
-            console.error('Error in updateUserProfile service:', error);
-            return { success: false, message: error.message || 'Something went wrong!' };
+            return { success: false, message: error.message };
         }
     }
 }

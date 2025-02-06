@@ -1,11 +1,11 @@
 // controllers/auth.controller.ts
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { authService } from './auth.service';
 
 class AuthController {
 
 
-    async register(req: Request, res: Response) {
+    async register(req: Request, res: Response, next: NextFunction) {
         const { email, password, username } = req.body;
         try {
             const newUser = await authService.registerUserWithEmailVerify(email, password, username);
@@ -15,29 +15,30 @@ class AuthController {
                 message: newUser?.message,
                 status: true,
             })
-        } catch (error: any) {
-            res.json({
-                statusCode: 400,
-                message: error.message || 'Registration failed',
-                status: false,
-            })
+        } catch (err: any) {
+            const error = {
+                status: 400,
+                message: err.errors[0].message || 'Registration failed',
+            };
+            next(error);
         }
     }
 
-    async verifyUserEmail(req: Request, res: Response): Promise<void> {
+    async verifyUserEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const result = await authService.verifyUserEmail(req);
             res.status(result.success ? 200 : 400).json(result);
-        } catch (error: any) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-            });
+        } catch (err: any) {
+            const error = {
+                status: 500,
+                message: err.errors[0].message || 'Internal Server Error',
+            };
+            next(error);
         }
     }
 
 
-    async login(req: Request, res: Response) {
+    async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
             const { user, token } = await authService.loginUser(email, password);
@@ -51,17 +52,17 @@ class AuthController {
                 data: { email: user?.email, token, username: user?.username },
                 status: true,
             })
-        } catch (error: any) {
-            res.json({
-                statusCode: 401,
-                message: error.message || 'Login failed',
-                status: false
-            })
+        } catch (err: any) {
+            const error = {
+                status: 401,
+                message: err.errors[0].message || 'Login failed!',
+            };
+            next(error);
         }
     }
 
 
-    async sendVerificationCode(req: Request, res: Response) {
+    async sendVerificationCode(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await authService.sendVerificationCode(req);
 
@@ -71,18 +72,17 @@ class AuthController {
                 data: [],
                 statusCode: result.success ? 200 : 400,
             });
-        } catch (error) {
-            res.json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                status: 500,
+                message: err.errors[0].message || 'Internal Server Error',
+            };
+            next(error);
         }
     }
 
 
-    async verifyVerificationCode(req: Request, res: Response) {
+    async verifyVerificationCode(req: Request, res: Response, next: NextFunction) {
         const { email, providedCode } = req.body;
         try {
             const result = await authService.verifVerificationCode(email, providedCode);
@@ -92,19 +92,18 @@ class AuthController {
                 data: [],
                 statusCode: result.success ? 200 : 400,
             });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                status: 500,
+                message: err.errors[0].message || 'Internal Server Error',
+            };
+            next(error);
         }
     }
 
 
 
-    async changePassword(req: any, res: any) {
+    async changePassword(req: any, res: any, next: NextFunction) {
         const { userId, verified } = req.user;
         const { oldPassword, newPassword } = req.body;
         try {
@@ -114,18 +113,16 @@ class AuthController {
                 message: result.message,
                 statusCode: result.success ? 200 : 401,
             });
-        } catch (error) {
-            console.error('Error in changePassword controller:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors[0].message || 'Error in change password!',
+                status: 500,
+            }
+            next(error);
         }
     }
 
-    async sendForgotCode(req: Request, res: Response) {
+    async sendForgotCode(req: Request, res: Response, next: NextFunction) {
         try {
             const result = await authService.sendForgotPasswordCode(req);
             res.json({
@@ -134,17 +131,16 @@ class AuthController {
                 data: [],
                 statusCode: result.success ? 200 : 400,
             });
-        } catch (error) {
-            res.json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors[0].message || 'Internal Server Error',
+                status: 500,
+            }
+            next(error);
         }
     }
 
-    async verifyForgotPasswordCode(req: Request, res: Response) {
+    async verifyForgotPasswordCode(req: Request, res: Response, next: NextFunction) {
         const { email, providedCode, newPassword } = req.body;
         try {
             const result = await authService.verifyForgotPasswordCode(email, providedCode, newPassword);
@@ -154,18 +150,16 @@ class AuthController {
                 data: [],
                 statusCode: result.success ? 200 : 400,
             });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors?.[0]?.message || 'Internal Server Error',
+                status: 500,
+            };
+            next(error);
         }
     }
 
-    async signOut(req: Request, res: Response) {
-
+    async signOut(req: Request, res: Response, next: NextFunction) {
         try {
             res.clearCookie('Authorization').status(200).json({
                 success: true,
@@ -173,43 +167,37 @@ class AuthController {
                 data: [],
                 statusCode: 200,
             });
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors?.[0]?.message || 'Internal Server Error',
+                status: 500,
+            };
+            next(error);
         }
     }
 
-    async updateProfile(req: any, res: Response) {
+    async updateProfile(req: any, res: Response, next: NextFunction) {
         const { _id } = req.user;
         const { username, avatar } = req.body;
 
         try {
             if (!username && !avatar) {
-                res.status(400).json({
-                    success: false,
-                    message: 'No profile fields provided to update.',
-                    data: [],
-                    statusCode: 400,
-                });
+                const error = {
+                    message: 'No fields provided to update the profile!!',
+                    status: 400,
+                };
+                next(error);
             }
 
             // Update user information in the service layer
-            const updatedUser = await authService.updateUserProfile(_id,
-                username,
-                avatar,
-            );
+            const updatedUser = await authService.updateUserProfile(_id, username, avatar);
 
             if (!updatedUser) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Profile update failed.',
-                    data: [],
-                    statusCode: 400,
-                });
+                const error = {
+                    message: 'Profile update failed.!',
+                    status: 400,
+                };
+                next(error);
             }
 
             res.status(200).json({
@@ -222,17 +210,14 @@ class AuthController {
                 statusCode: 200,
             });
 
-        } catch (error) {
-            console.error('Error in updateProfile controller:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Internal Server Error',
-                data: [],
-                statusCode: 500,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors?.[0]?.message || 'Internal Server Error',
+                status: 500,
+            };
+            next(error);
         }
     }
-
 }
 
 export const authController = new AuthController();

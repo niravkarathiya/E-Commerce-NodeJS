@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { purchaseService } from './purchase.service';
 
 class PurchaseController {
 
     // Create a new purchase
-    async createPurchase(req: Request, res: Response) {
+    async createPurchase(req: Request, res: Response, next: NextFunction) {
         try {
             const newPurchase = await purchaseService.createPurchase(req.body);
             res.json({
@@ -13,17 +13,17 @@ class PurchaseController {
                 data: newPurchase,
                 status: true,
             });
-        } catch (error: any) {
-            res.json({
-                statusCode: 400,
-                message: error.message || 'Purchase failed!',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to purchase product!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
     // Get purchase by ID
-    async getPurchaseById(req: Request, res: Response) {
+    async getPurchaseById(req: Request, res: Response, next: NextFunction) {
         try {
             const purchase = await purchaseService.getPurchaseById(req.params.id);
             res.json({
@@ -32,17 +32,17 @@ class PurchaseController {
                 data: purchase.purchase,
                 status: true,
             });
-        } catch (error: any) {
-            res.json({
-                statusCode: 404,
-                message: error.message || 'Purchase not found',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Order not found!',
+                status: 404,
+            }
+            next(error);
         }
     }
 
     // Get all purchases with optional filters
-    async getPurchases(req: Request, res: Response) {
+    async getPurchases(req: Request, res: Response, next: NextFunction) {
         const { page = 1, limit = 10, sort = '{}' } = req.query;
         try {
             const purchases = await purchaseService.getPurchases({}, Number(page), Number(limit), JSON.parse(sort as string));
@@ -52,17 +52,17 @@ class PurchaseController {
                 data: purchases.purchases,
                 status: true,
             });
-        } catch (error: any) {
-            res.json({
-                statusCode: 400,
-                message: error.message || 'Error fetching purchases',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Filed to fetch orders!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
     // Update a purchase by ID
-    async updatePurchase(req: Request, res: Response) {
+    async updatePurchase(req: Request, res: Response, next: NextFunction) {
         try {
             const updatedPurchase = await purchaseService.updatePurchase(req.params.id, req.body);
             res.json({
@@ -71,17 +71,17 @@ class PurchaseController {
                 data: updatedPurchase,
                 status: true,
             });
-        } catch (error: any) {
-            res.json({
-                statusCode: 400,
-                message: error.message || 'Purchase update failed',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to modify order!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
     // Delete a purchase by ID
-    async deletePurchase(req: Request, res: Response) {
+    async deletePurchase(req: Request, res: Response, next: NextFunction) {
         try {
             const deletedPurchase = await purchaseService.deletePurchase(req.params.id);
             res.json({
@@ -90,12 +90,12 @@ class PurchaseController {
                 data: deletedPurchase,
                 status: true,
             });
-        } catch (error: any) {
-            res.json({
-                statusCode: 404,
-                message: error.message || 'Purchase not found',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Order not found!',
+                status: 500,
+            }
+            next(error);
         }
     }
 

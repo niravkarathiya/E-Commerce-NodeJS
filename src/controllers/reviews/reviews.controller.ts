@@ -5,7 +5,7 @@ import { reviewService } from './review.service';
 class ReviewController {
 
     // Create a new review
-    async createReview(req: any, res: Response) {
+    async createReview(req: any, res: Response, next: NextFunction) {
         try {
             const { productId } = req.params;
             const reviewData = {
@@ -17,11 +17,11 @@ class ReviewController {
             // Check if the product exists
             const productExists = await productService.getProductById(productId);
             if (!productExists) {
-                res.status(404).json({
-                    statusCode: 404,
+                const error = {
                     message: 'Product not found!',
-                    status: false,
-                });
+                    status: 500,
+                }
+                next(error);
             }
 
             const newReview = await reviewService.createReview(reviewData);
@@ -31,17 +31,17 @@ class ReviewController {
                 data: newReview,
                 status: true,
             });
-        } catch (error: any) {
-            res.status(500).json({
-                statusCode: 500,
-                message: error.message || 'Failed to create review!',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to add review!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
     // Get all reviews for a product
-    async getProductReviews(req: Request, res: Response) {
+    async getProductReviews(req: Request, res: Response, next: NextFunction) {
         try {
             const { productId } = req.params;
             const reviews = await reviewService.getProductReviews(productId);
@@ -52,17 +52,17 @@ class ReviewController {
                 data: reviews.reviews || [],
                 status: true,
             });
-        } catch (error) {
-            res.status(500).json({
-                statusCode: 500,
+        } catch (err: any) {
+            const error = {
                 message: 'Failed to fetch reviews!',
-                status: false,
-            });
+                status: 500,
+            }
+            next(error);
         }
     }
 
     // Update a review
-    async updateReview(req: any, res: Response) {
+    async updateReview(req: any, res: Response, next: NextFunction) {
         try {
             const { reviewId } = req.params;
             const updateData = req.body;
@@ -71,11 +71,11 @@ class ReviewController {
             const updatedReview = await reviewService.updateReview(reviewId, updateData, userId);
 
             if (!updatedReview) {
-                res.status(404).json({
-                    statusCode: 404,
-                    message: 'Review not found or unauthorized!',
-                    status: false,
-                });
+                const error = {
+                    message: 'Review not found!',
+                    status: 404,
+                }
+                next(error);
             }
 
             res.status(200).json({
@@ -84,28 +84,28 @@ class ReviewController {
                 data: updatedReview,
                 status: true,
             });
-        } catch (error: any) {
-            res.status(400).json({
-                statusCode: 400,
-                message: error.message || 'Failed to update review!',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to modify the review!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
     // Delete a review
-    async deleteReview(req: any, res: Response) {
+    async deleteReview(req: any, res: Response, next: NextFunction) {
         try {
             const { reviewId } = req.params;
 
             const deletedReview = await reviewService.deleteReview(reviewId);
 
             if (!deletedReview) {
-                res.status(404).json({
-                    statusCode: 404,
-                    message: 'Review not found or unauthorized!',
-                    status: false,
-                });
+                const error = {
+                    message: 'Review not found!',
+                    status: 400,
+                }
+                next(error);
             }
 
             res.status(200).json({
@@ -113,12 +113,12 @@ class ReviewController {
                 message: 'Review deleted successfully!',
                 status: true,
             });
-        } catch (error) {
-            res.status(500).json({
-                statusCode: 500,
+        } catch (err: any) {
+            const error = {
                 message: 'Failed to delete review!',
-                status: false,
-            });
+                status: 400,
+            }
+            next(error);
         }
     }
 }

@@ -1,12 +1,12 @@
 // controllers/product.controller.ts
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { productService } from './product.service';
 
 
 class ProductController {
 
 
-    async createProduct(req: Request, res: Response) {
+    async createProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const newProduct = await productService.createProduct(req.body);
             res.status(201).json({
@@ -15,17 +15,17 @@ class ProductController {
                 data: newProduct,
                 status: true,
             });
-        } catch (error: any) {
-            res.status(400).json({
-                statusCode: 400,
-                message: error.message || 'Product creation failed',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors[0].message || 'Product creation failed!',
+                status: 400,
+            }
+            next(error);
         }
     }
 
 
-    async getProducts(req: Request, res: Response) {
+    async getProducts(req: Request, res: Response, next: NextFunction) {
         try {
             const products = await productService.getProducts();
             res.status(200).json({
@@ -34,17 +34,17 @@ class ProductController {
                 data: products.products || [],
                 status: true,
             });
-        } catch (error) {
-            res.status(500).json({
-                statusCode: 500,
-                message: 'Failed to retrieve products',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: err.errors[0].message || 'Failed to getting products!',
+                status: 500,
+            }
+            next(error);
         }
     }
 
 
-    async getProductById(req: Request, res: Response) {
+    async getProductById(req: Request, res: Response, next: NextFunction) {
         const { productId } = req.params;
         try {
             const product = await productService.getProductById(productId);
@@ -61,17 +61,17 @@ class ProductController {
                 data: product,
                 status: true,
             });
-        } catch (error) {
-            res.status(500).json({
-                statusCode: 500,
-                message: 'Failed to retrieve product',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to getting product!',
+                status: 500,
+            }
+            next(error);
         }
     }
 
 
-    async updateProduct(req: Request, res: Response) {
+    async updateProduct(req: Request, res: Response, next: NextFunction) {
         const { productId } = req.params;
         try {
             const updatedProduct = await productService.updateProduct(productId, req.body);
@@ -88,17 +88,17 @@ class ProductController {
                 data: updatedProduct,
                 status: true,
             });
-        } catch (error: any) {
-            res.status(400).json({
-                statusCode: 400,
-                message: error.message || 'Product update failed',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to modify product!',
+                status: 500,
+            }
+            next(error);
         }
     }
 
 
-    async deleteProduct(req: Request, res: Response) {
+    async deleteProduct(req: Request, res: Response, next: NextFunction) {
         const { productId } = req.params;
         try {
             const deletedProduct = await productService.deleteProduct(productId);
@@ -114,12 +114,12 @@ class ProductController {
                 message: 'Product deleted successfully',
                 status: true,
             });
-        } catch (error) {
-            res.status(500).json({
-                statusCode: 500,
-                message: 'Failed to delete product',
-                status: false,
-            });
+        } catch (err: any) {
+            const error = {
+                message: 'Failed to delete product!',
+                status: 500,
+            }
+            next(error);
         }
     }
 }

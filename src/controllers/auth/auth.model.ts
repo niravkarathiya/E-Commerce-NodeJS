@@ -42,6 +42,9 @@ const userSchema = new Schema({
         required: [true, "User name is required!"],
         trim: true,
         lowercase: true,
+    },
+    refreshToken: {
+
     }
 }, {
     timestamps: true,

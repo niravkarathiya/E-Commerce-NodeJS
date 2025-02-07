@@ -4,6 +4,8 @@ import User from './auth.model';
 import { doHash, doHashValidation, hmacProcess } from '../../utils/hashing';
 import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchema, loginSchema, registerSchema } from "./auth.validators";
 import { sendEmail } from '../../utils/sendMail';
+import multer from 'multer';
+import cloudinary from '../../utils/cloudinary.config';
 
 class AuthService {
 
@@ -25,7 +27,6 @@ class AuthService {
         try {
             const defaultAvatarBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAg0B7kH4VQAAAABJRU5ErkJggg==";
             const { error } = registerSchema.validate({ email, password });
-
             if (error) throw new Error(error.details[0].message);
 
             const existingUser = await User.findOne({ email });
@@ -75,8 +76,51 @@ class AuthService {
         if (error) throw new Error(error.details[0].message);
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid email or password');
 
-        const token = jwt.sign({ _id: user._id, email: user.email, verified: user.verified }, process.env.TOKEN_SECRET as string, { expiresIn: '8h' });
-        return { user, token };
+        const accessToken = this.generateAccessToken(user);
+        const refreshToken = this.generateRefreshToken(user);
+
+        // Store refresh token in the schema
+        user.refreshToken = refreshToken;
+        await user.save();
+
+        return { user, accessToken, refreshToken };
+    }
+
+    generateAccessToken(user: any) {
+        return jwt.sign(
+            { _id: user._id, verified: user.verified },
+            process.env.TOKEN_SECRET as string,
+            { expiresIn: '8h' }
+        );
+    }
+
+    generateRefreshToken(user: any) {
+        return jwt.sign(
+            { _id: user._id },
+            process.env.REFRESH_TOKEN_SECRET as string,
+            { expiresIn: '7d' }
+        );
+    }
+
+    async refreshAccessToken(refreshToken: string) {
+        try {
+            const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as any;
+
+            const user = await User.findById(payload._id);
+            if (!user || user.refreshToken !== refreshToken) {
+                throw new Error('Invalid or mismatched refresh token');
+            }
+
+            const newAccessToken = this.generateAccessToken(user);
+            const newRefreshToken = this.generateRefreshToken(user);
+
+            user.refreshToken = newRefreshToken;
+            await user.save();
+
+            return { newAccessToken, newRefreshToken };
+        } catch (err) {
+            throw new Error('Refresh token is invalid or expired, Please login again!');
+        }
     }
 
     async sendVerificationCode(req: any) {
@@ -198,20 +242,41 @@ class AuthService {
         return { success: false, message: 'Something went wrong!' };
     }
 
-    async updateUserProfile(userId: string, username?: string, avatar?: string) {
+    async updateUserProfile(userId: string, username?: string, avatarFile?: Express.Multer.File) {
         try {
             const user = await User.findById(userId);
             if (!user) throw new Error('User not found');
 
             if (username) user.username = username;
-            if (avatar) user.avatar = avatar;
+
+            if (avatarFile) {
+                // Upload the avatar to Cloudinary
+                const uploadResult = await new Promise<any>((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        { folder: "user_uploads" },
+                        (error, result) => {
+                            if (error) return reject(error);
+                            resolve(result);
+                        }
+                    );
+                    uploadStream.end(avatarFile.buffer);
+                });
+
+                user.avatar = uploadResult.secure_url;
+            }
 
             await user.save();
-            return { success: true, message: 'Profile updated successfully!', data: { username: user.username, avatar: user.avatar } };
+
+            return {
+                success: true,
+                message: 'Profile updated successfully!',
+                data: { username: user.username, avatar: user.avatar },
+            };
         } catch (error: any) {
             return { success: false, message: error.message };
         }
     }
+
 }
 
 export const authService = new AuthService();

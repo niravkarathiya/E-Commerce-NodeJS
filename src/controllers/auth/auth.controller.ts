@@ -4,7 +4,6 @@ import { authService } from './auth.service';
 
 class AuthController {
 
-
     async register(req: Request, res: Response, next: NextFunction) {
         const { email, password, username } = req.body;
         try {
@@ -41,23 +40,62 @@ class AuthController {
     async login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body;
         try {
-            const { user, token } = await authService.loginUser(email, password);
-            res.cookie('Authorization', `Bearer ${token}`, {
-                expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day from now
-                httpOnly: process.env.NODE_ENV === 'production',
-                secure: process.env.NODE_ENV === 'production',
-            }).json({
-                statusCode: 200,
-                message: 'Login successful',
-                data: { email: user?.email, token, username: user?.username },
-                status: true,
-            })
+            const { user, accessToken, refreshToken } = await authService.loginUser(email, password);
+
+            res
+                .cookie('Authorization', `Bearer ${accessToken}`, {
+                    expires: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes for access token
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                })
+                .cookie('RefreshToken', refreshToken, {
+                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days for refresh token
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                })
+                .json({
+                    statusCode: 200,
+                    message: 'Login successful',
+                    data: { email: user?.email, username: user?.username, avatar: user?.avatar, },
+                    status: true,
+                });
         } catch (err: any) {
             const error = {
                 status: 401,
-                message: err.errors[0].message || 'Login failed!',
+                message: err.message || 'Login failed!',
             };
             next(error);
+        }
+    }
+
+    async refreshToken(req: Request, res: Response, next: NextFunction) {
+        try {
+            const refreshToken = req.cookies.RefreshToken;
+            if (!refreshToken) throw new Error('Refresh token is missing');
+
+            const { newAccessToken, newRefreshToken } = await authService.refreshAccessToken(refreshToken);
+
+            res
+                .cookie('Authorization', `Bearer ${newAccessToken}`, {
+                    expires: new Date(Date.now() + 2 * 60 * 1000),
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                })
+                .cookie('RefreshToken', newRefreshToken, {
+                    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                })
+                .json({
+                    statusCode: 200,
+                    message: 'Access token refreshed successfully',
+                    accessToken: newAccessToken,
+                });
+        } catch (err: any) {
+            next({
+                status: 401,
+                message: err.message || 'Unable to refresh access token',
+            });
         }
     }
 
@@ -178,44 +216,29 @@ class AuthController {
 
     async updateProfile(req: any, res: Response, next: NextFunction) {
         const { _id } = req.user;
-        const { username, avatar } = req.body;
+        const { username } = req.body;
+        const avatar = req.file;
 
         try {
             if (!username && !avatar) {
-                const error = {
-                    message: 'No fields provided to update the profile!!',
-                    status: 400,
-                };
-                next(error);
+                return next({ message: 'No fields provided to update the profile!!', status: 400 });
             }
 
-            // Update user information in the service layer
             const updatedUser = await authService.updateUserProfile(_id, username, avatar);
 
-            if (!updatedUser) {
-                const error = {
-                    message: 'Profile update failed.!',
-                    status: 400,
-                };
-                next(error);
+            if (!updatedUser.success) {
+                return next({ message: 'Profile update failed!', status: 400 });
             }
 
             res.status(200).json({
                 success: true,
-                message: 'Profile updated successfully.',
-                data: {
-                    username: updatedUser?.data?.username,
-                    avatar: updatedUser?.data?.avatar,
-                },
+                message: updatedUser.message,
+                data: updatedUser.data,
                 statusCode: 200,
             });
 
         } catch (err: any) {
-            const error = {
-                message: err.errors?.[0]?.message || 'Internal Server Error',
-                status: 500,
-            };
-            next(error);
+            next({ message: err.message || 'Internal Server Error', status: 500 });
         }
     }
 }

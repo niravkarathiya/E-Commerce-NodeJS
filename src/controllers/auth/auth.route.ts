@@ -2,6 +2,7 @@
 import { Router } from 'express';
 import { authController } from './auth.controller';
 import { loggedIn } from '../../middlewares/auth.middleware';
+import upload from '../../utils/multer.config';
 
 const authRouter = Router();
 
@@ -10,6 +11,9 @@ authRouter.post('/register', authController.register);
 
 // Login route
 authRouter.post('/login', authController.login);
+
+// Generate refresh token
+authRouter.post('/refresh-token', authController.refreshToken);
 
 //Sending code for verification
 authRouter.patch('/send-verification-code', authController.sendVerificationCode);
@@ -29,7 +33,8 @@ authRouter.patch('/verify-forgot-password-code', authController.verifyForgotPass
 //log out if user is already logged in
 authRouter.post('/sign-out', loggedIn, authController.signOut);
 
-authRouter.patch('/update-profile', loggedIn, authController.updateProfile);
+//Update profile 
+authRouter.patch('/update-profile', loggedIn, upload.single('avatar'), authController.updateProfile);
 
 // Email verification route
 authRouter.get('/verify-email', authController.verifyUserEmail);

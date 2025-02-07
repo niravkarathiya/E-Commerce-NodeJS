@@ -20,6 +20,7 @@ import addressRoute from './controllers/address/address.routes';
 //database connection
 import connectDB from './utils/dbConnection';
 import logRequest from './middlewares/log.middleware';
+import errorMiddleware from './middlewares/error.middleware';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 // Middleware to log request details
 app.use(logRequest);
 
@@ -47,6 +49,8 @@ app.use('/products', productRoute);
 app.use('/review', reviewRoute);
 app.use('/purchase', purchaseRoute);
 app.use('/address', addressRoute);
+
+app.use(errorMiddleware);
 
 // starter page 
 app.get('/', (req: Request, res: Response) => {

@@ -43,12 +43,12 @@ const sendEmail = async ({ templatePath, emailData, subject, emailType, user }: 
                 user.forgotPasswordCode = hashedCodeValue;
                 user.forgotPasswordCodeValidation = Date.now();
                 await user.save();
-                return { success: true, statusCode: 200, message: 'Forgot password code has been sent to your email!' };
+                return { success: true, statusCode: 200, status: true, message: 'Forgot password code has been sent to your email!' };
             }
         }
     } catch (error) {
         console.error('Error sending email:', error);
-        return { success: false, statusCode: 400, message: 'An error occurred while sending the email.' };
+        return { success: false, statusCode: 400, status: false, message: 'An error occurred while sending the email.' };
     }
 }
 

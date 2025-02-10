@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi, { number } from 'joi';
 
 // Helper function to generate error messages for string fields
 const generateStringMessages = (field: string, min: number, max: number) => ({
@@ -22,7 +22,7 @@ const passwordValidation = Joi.string()
     });
 
 // Helper function for email validation
-const generateEmailValidation = (tlds: string[] = ['com']) =>
+const generateEmailValidation = (tlds = ['com']) =>
     Joi.string()
         .min(6)
         .max(60)
@@ -32,7 +32,7 @@ const generateEmailValidation = (tlds: string[] = ['com']) =>
         .messages(generateStringMessages('Email', 6, 60));
 
 // Helper function for code validation
-const generateCodeValidation = (type: 'string' | 'number') =>
+const generateCodeValidation = (type: string) =>
     type === 'number'
         ? Joi.number().required().messages({
             'number.base': 'Verification code must be a number.',
@@ -43,10 +43,29 @@ const generateCodeValidation = (type: 'string' | 'number') =>
             'any.required': 'Verification code is required.',
         });
 
+const avatarValidation = Joi.string().uri().messages({
+    'string.uri': 'Avatar must be a valid URI.',
+});
+
+const usernameValidation = Joi.string().min(3).max(30).required().messages({
+    'string.base': 'Username must be a string.',
+    'string.min': 'Username should have at least 3 characters.',
+    'string.max': 'Username should not exceed 30 characters.',
+    'any.required': 'Username is required.',
+});
+
+const roleValidation = Joi.string().valid('admin', 'user', 'vendor').required().messages({
+    'any.only': 'Role must be one of admin, user, or vendor.',
+    'any.required': 'Role is required.',
+});
+
 // Validation schemas
 export const registerSchema = Joi.object({
     email: generateEmailValidation(['com']),
     password: passwordValidation,
+    username: usernameValidation,
+    avatar: avatarValidation,
+    role: roleValidation,
 });
 
 export const loginSchema = Joi.object({
@@ -56,7 +75,7 @@ export const loginSchema = Joi.object({
 
 export const verificationCodeSchema = Joi.object({
     email: generateEmailValidation(['com', 'net']),
-    providedCode: generateCodeValidation('number'),
+    providedCode: generateCodeValidation('string'),
 });
 
 export const changePasswordSchema = Joi.object({
@@ -68,4 +87,14 @@ export const verifyForgotPasswordSchema = Joi.object({
     email: generateEmailValidation(['com', 'net']),
     providedCode: generateCodeValidation('string'),
     newPassword: passwordValidation,
+});
+
+export const updateUserSchema = Joi.object({
+    username: usernameValidation.optional(),
+    avatar: avatarValidation.optional(),
+    role: roleValidation.optional(),
+    verified: Joi.boolean().messages({
+        'boolean.base': 'Verified must be a boolean value.',
+    }).optional(),
+    refreshToken: Joi.string().optional(),
 });

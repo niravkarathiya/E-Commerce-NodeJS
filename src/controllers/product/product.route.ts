@@ -2,11 +2,12 @@
 import { Router } from 'express';
 import { loggedIn } from '../../middlewares/auth.middleware';
 import { productController } from './product.controller';
+import { isAdmin } from '../../middlewares/role-based.middleware';
 
 const productRoute = Router();
 
 // Create a new product
-productRoute.post('/create', loggedIn, productController.createProduct);
+productRoute.post('/create', [loggedIn, isAdmin], productController.createProduct);
 
 // Fetch all products
 productRoute.get('/list', productController.getProducts);
@@ -15,9 +16,9 @@ productRoute.get('/list', productController.getProducts);
 productRoute.get('/:productId', productController.getProductById);
 
 // Update a product by its ID
-productRoute.patch('/:productId', loggedIn, productController.updateProduct);
+productRoute.patch('/:productId', [loggedIn, isAdmin], productController.updateProduct);
 
 // Delete a product by its ID
-productRoute.delete('/:productId', loggedIn, productController.deleteProduct);
+productRoute.delete('/:productId', [loggedIn, isAdmin], productController.deleteProduct);
 
 export default productRoute;

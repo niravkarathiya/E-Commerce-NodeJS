@@ -6,7 +6,8 @@ import { productService } from './product.service';
 class ProductController {
 
 
-    async createProduct(req: Request, res: Response, next: NextFunction) {
+    async createProduct(req: any, res: Response, next: NextFunction) {
+
         try {
             const newProduct = await productService.createProduct(req.body);
             res.status(201).json({

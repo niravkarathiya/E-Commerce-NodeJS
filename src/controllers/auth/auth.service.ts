@@ -9,7 +9,7 @@ import cloudinary from '../../utils/cloudinary.config';
 class AuthService {
 
     async registerUser(email: string, password: string, username: string) {
-        const defaultAvatarBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAg0B7kH4VQAAAABJRU5ErkJggg==";
+        const defaultAvatar = 'https://res.cloudinary.com/dnaaqd8pd/image/upload/v1738935441/user_uploads/v5l5mtycndlbbd9ofsdp.jpg';
         const existingUser = await User.findOne({ email });
         const { error } = registerSchema.validate({ email, password });
 
@@ -17,22 +17,23 @@ class AuthService {
         if (existingUser) throw new Error('User already exists!');
 
         const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = new User({ email, password: hashedPassword, avatar: defaultAvatarBase64, username });
+        const newUser = new User({ email, password: hashedPassword, avatar: defaultAvatar, username });
         await newUser.save();
         return newUser;
     }
 
-    async registerUserWithEmailVerify(email: string, password: string, username: string) {
+    async registerUserWithEmailVerify(email: string, password: string, username: string, role: string) {
         try {
-            const defaultAvatarBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAg0B7kH4VQAAAABJRU5ErkJggg==";
-            const { error } = registerSchema.validate({ email, password });
-            if (error) throw new Error(error.details[0].message);
+            const defaultAvatar = 'https://res.cloudinary.com/dnaaqd8pd/image/upload/v1738935441/user_uploads/v5l5mtycndlbbd9ofsdp.jpg';
+
+            const { error } = registerSchema.validate({ email, password, username, role });
+            if (error) return ({ message: error.details[0].message, statusCode: 400, status: false });
 
             const existingUser = await User.findOne({ email });
-            if (existingUser) return { success: false, message: 'User already exists!', statusCode: 409 }
+            if (existingUser) return { success: false, message: 'User already exists!', statusCode: 409, status: false }
 
             const hashedPassword = await bcrypt.hash(password, 12);
-            const newUser = new User({ email, password: hashedPassword, avatar: defaultAvatarBase64, username, verified: false });
+            const newUser = new User({ email, password: hashedPassword, avatar: defaultAvatar, username, verified: false, role: role });
             const verificationLink = `${process.env.FRONTEND_URL}/verify-email?email=${encodeURIComponent(email)}`;
             const emailData = { verificationLink };
 
@@ -45,7 +46,7 @@ class AuthService {
             });
 
         } catch (err: any) {
-            return { success: false, message: err.message, statusCode: 400 };
+            return { success: false, message: err.message, statusCode: 400, status: false };
         }
     }
 
@@ -87,7 +88,7 @@ class AuthService {
 
     generateAccessToken(user: any) {
         return jwt.sign(
-            { _id: user._id, verified: user.verified },
+            { _id: user._id, verified: user.verified, role: user.role },
             process.env.TOKEN_SECRET as string,
             { expiresIn: '8h' }
         );
@@ -249,7 +250,6 @@ class AuthService {
             if (username) user.username = username;
 
             if (avatarFile) {
-                // Upload the avatar to Cloudinary
                 const uploadResult = await new Promise<any>((resolve, reject) => {
                     const uploadStream = cloudinary.uploader.upload_stream(
                         { folder: "user_uploads" },

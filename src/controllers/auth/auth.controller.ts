@@ -5,14 +5,14 @@ import { authService } from './auth.service';
 class AuthController {
 
     async register(req: Request, res: Response, next: NextFunction) {
-        const { email, password, username } = req.body;
+        const { email, password, username, role } = req.body;
         try {
-            const newUser = await authService.registerUserWithEmailVerify(email, password, username);
+            const newUser = await authService.registerUserWithEmailVerify(email, password, username, role);
 
             res.json({
                 statusCode: newUser?.statusCode,
                 message: newUser?.message,
-                status: true,
+                status: newUser?.status,
             })
         } catch (err: any) {
             const error = {
@@ -56,7 +56,7 @@ class AuthController {
                 .json({
                     statusCode: 200,
                     message: 'Login successful',
-                    data: { email: user?.email, username: user?.username, avatar: user?.avatar, },
+                    data: { email: user?.email, username: user?.username, avatar: user?.avatar, token: accessToken },
                     status: true,
                 });
         } catch (err: any) {

@@ -242,27 +242,27 @@ class AuthService {
         return { success: false, message: 'Something went wrong!' };
     }
 
-    async updateUserProfile(userId: string, username?: string,) {
+    async updateUserProfile(userId: string, username?: string, avatarFile?: Express.Multer.File) {
         try {
             const user = await User.findById(userId);
             if (!user) throw new Error('User not found');
 
             if (username) user.username = username;
 
-            // if (avatarFile) {
-            //     const uploadResult = await new Promise<any>((resolve, reject) => {
-            //         const uploadStream = cloudinary.uploader.upload_stream(
-            //             { folder: "user_uploads" },
-            //             (error, result) => {
-            //                 if (error) return reject(error);
-            //                 resolve(result);
-            //             }
-            //         );
-            //         uploadStream.end(avatarFile.buffer);
-            //     });
+            if (avatarFile) {
+                const uploadResult = await new Promise<any>((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        { folder: "user_uploads" },
+                        (error, result) => {
+                            if (error) return reject(error);
+                            resolve(result);
+                        }
+                    );
+                    uploadStream.end(avatarFile.buffer);
+                });
 
-            //     user.avatar = uploadResult.secure_url;
-            // }
+                user.avatar = uploadResult.secure_url;
+            }
 
             await user.save();
 

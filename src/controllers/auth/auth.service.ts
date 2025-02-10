@@ -4,7 +4,6 @@ import User from './auth.model';
 import { doHash, doHashValidation, hmacProcess } from '../../utils/hashing';
 import { verifyForgotPasswordSchema, verificationCodeSchema, changePasswordSchema, loginSchema, registerSchema } from "./auth.validators";
 import { sendEmail } from '../../utils/sendMail';
-import multer from 'multer';
 import cloudinary from '../../utils/cloudinary.config';
 
 class AuthService {

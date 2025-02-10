@@ -21,8 +21,16 @@ import addressRoute from './controllers/address/address.routes';
 import connectDB from './utils/dbConnection';
 import logRequest from './middlewares/log.middleware';
 import errorMiddleware from './middlewares/error.middleware';
+import swaggerUi from "swagger-ui-express";
+import YAML from 'yamljs';
 
 const app = express();
+
+// Load the Swagger YAML file
+const swaggerDocument = YAML.load('./swagger.yml');
+
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //set view engine for the handlebars and configuration
 app.engine("handlebars", engine({ defaultLayout: "main" }));

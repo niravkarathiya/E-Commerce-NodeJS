@@ -1,0 +1,431 @@
+openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
+  description: API documentation for the E-commerce application
+servers:
+  - url: http://localhost:8000/
+  - url: http://localhost:3000/
+paths:
+  /products:
+    post:
+      summary: Create a new product
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Sample Product
+                description:
+                  type: string
+                  example: This is a sample product.
+                price:
+                  type: number
+                  example: 99.99
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '400':
+          description: Product creation failed
+    get:
+      summary: Retrieve all products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: Products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  status:
+                    type: boolean
+        '500':
+          description: Failed to retrieve products
+
+  /products/{productId}:
+    get:
+      summary: Get product by ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '404':
+          description: Product not found
+        '500':
+          description: Failed to get product
+
+    put:
+      summary: Update a product by ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '404':
+          description: Product not found
+        '500':
+          description: Failed to update product
+
+    delete:
+      summary: Delete a product by ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+        '404':
+          description: Product not found
+        '500':
+          description: Failed to delete product
+
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                username:
+                  type: string
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  status:
+                    type: boolean
+        '400':
+          description: Registration failed
+
+  /auth/login:
+    post:
+      summary: Login user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '401':
+          description: Login failed
+
+  /auth/refresh-token:
+    post:
+      summary: Refresh access token
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  accessToken:
+                    type: string
+        '401':
+          description: Unable to refresh access token
+
+  /auth/logout:
+    post:
+      summary: Logout user
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  statusCode:
+                    type: integer
+
+  /address:
+    post:
+      summary: Create a new address
+      tags:
+        - Address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                zipCode:
+                  type: string
+      responses:
+        '201':
+          description: Address created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '400':
+          description: Address creation failed
+
+  /address/{id}:
+    get:
+      summary: Get address by ID
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Address fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '404':
+          description: Address not found
+
+    put:
+      summary: Update an address by ID
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                zipCode:
+                  type: string
+      responses:
+        '200':
+          description: Address updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '400':
+          description: Address update failed
+
+    delete:
+      summary: Delete an address by ID
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Address deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: object
+                  status:
+                    type: boolean
+        '404':
+          description: Address not found

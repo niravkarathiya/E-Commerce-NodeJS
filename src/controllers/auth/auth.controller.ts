@@ -217,14 +217,14 @@ class AuthController {
     async updateProfile(req: any, res: Response, next: NextFunction) {
         const { _id } = req.user;
         const { username } = req.body;
-        const avatar = req.file;
+        // const avatar = req.file;
 
         try {
-            if (!username && !avatar) {
+            if (!username) {
                 return next({ message: 'No fields provided to update the profile!!', status: 400 });
             }
 
-            const updatedUser = await authService.updateUserProfile(_id, username, avatar);
+            const updatedUser = await authService.updateUserProfile(_id, username);
 
             if (!updatedUser.success) {
                 return next({ message: 'Profile update failed!', status: 400 });

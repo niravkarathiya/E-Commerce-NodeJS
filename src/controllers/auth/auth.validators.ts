@@ -96,5 +96,5 @@ export const updateUserSchema = Joi.object({
     verified: Joi.boolean().messages({
         'boolean.base': 'Verified must be a boolean value.',
     }).optional(),
-    refreshToken: Joi.string().optional(),
+    refreshToken: Joi.string().optional()
 });

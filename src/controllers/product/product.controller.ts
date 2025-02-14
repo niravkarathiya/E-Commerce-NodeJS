@@ -28,7 +28,10 @@ class ProductController {
 
     async getProducts(req: Request, res: Response, next: NextFunction) {
         try {
-            const products = await productService.getProducts();
+            const filters = req.query.filter;
+            const page = req.query.page || 0;
+            const sort = req.query.sort;
+            const products = await productService.getProducts(filters, page, sort);
             res.status(200).json({
                 statusCode: 200,
                 message: 'Products retrieved successfully',

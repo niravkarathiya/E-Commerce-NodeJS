@@ -41,7 +41,6 @@ class AuthController {
         const { email, password } = req.body;
         try {
             const { user, accessToken, refreshToken } = await authService.loginUser(email, password);
-
             res
                 .cookie('Authorization', `Bearer ${accessToken}`, {
                     expires: new Date(Date.now() + 2 * 60 * 1000), // 2 minutes for access token
@@ -55,7 +54,7 @@ class AuthController {
                 })
                 .json({
                     statusCode: 200,
-                    message: 'Login successful',
+                    message: 'Login successfully!',
                     data: { email: user?.email, username: user?.username, avatar: user?.avatar, token: accessToken },
                     status: true,
                 });
@@ -178,15 +177,16 @@ class AuthController {
         }
     }
 
-    async verifyForgotPasswordCode(req: Request, res: Response, next: NextFunction) {
+    async verifyForgotPasswordCode(req: any, res: Response, next: NextFunction) {
+        console.log(req.user);
         const { email, providedCode, newPassword } = req.body;
         try {
             const result = await authService.verifyForgotPasswordCode(email, providedCode, newPassword);
-            res.status(result.success ? 200 : 400).json({
+            res.json({
                 success: result.success,
                 message: result.message,
                 data: [],
-                statusCode: result.success ? 200 : 400,
+                statusCode: result.success ? 200 : result.statusCode,
             });
         } catch (err: any) {
             const error = {

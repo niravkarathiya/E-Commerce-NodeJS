@@ -25,10 +25,10 @@ class ProductService {
     }
 
     // Fetch all products with optional filters, pagination, and sorting
-    async getProducts(filters = {}, page = 1, limit = 10, sort = {}) {
+    async getProducts(filters: any, page: any, sort: any) {
         const products = await Product.find(filters)
-            .skip((page - 1) * limit)
-            .limit(limit)
+            .skip(page * 5)
+            .limit(5)
             .sort(sort);
 
         const totalCount = await Product.countDocuments(filters);
@@ -36,7 +36,7 @@ class ProductService {
             products,
             totalCount,
             page,
-            totalPages: Math.ceil(totalCount / limit)
+            totalPages: Math.ceil(totalCount / 5)
         };
     }
 

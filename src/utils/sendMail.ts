@@ -31,7 +31,7 @@ const sendEmail = async ({ templatePath, emailData, subject, emailType, user }: 
         if (info.accepted[0] === user.email) {
             if (emailType === 'register') {
                 await user.save();
-                return { success: true, statusCode: 200, email: user.email, message: 'User registered successfully. Please check your mailbox to verify your email!' };
+                return { success: true, statusCode: 200, status: true, email: user.email, message: 'User registered successfully. Please check your mailbox to verify your email!' };
             } else if (emailType === 'verify') {
                 const hashedCodeValue = hmacProcess(emailData.verificationCode, process.env.HMAC_CODE_SECRET);
                 user.verificationCode = hashedCodeValue;

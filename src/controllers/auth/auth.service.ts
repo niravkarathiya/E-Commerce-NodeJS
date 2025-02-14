@@ -74,6 +74,9 @@ class AuthService {
         const { error } = loginSchema.validate({ email, password });
 
         if (error) throw new Error(error.details[0].message);
+
+        if (!user?.verified) throw new Error('You have to verify your account using mail that you have recieved after register!');
+
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid email or password');
 
         const accessToken = this.generateAccessToken(user);
@@ -195,6 +198,7 @@ class AuthService {
 
     async sendForgotPasswordCode(req: any) {
         const { email } = req.body;
+        req.user = email;
         const existingUser = await User.findOne({ email }).select('+password');
 
         if (!existingUser) return { success: false, message: 'User does not exist!' };
@@ -227,7 +231,7 @@ class AuthService {
 
         if (error) return { success: false, message: error.details[0].message, statusCode: 401 };
         if (!existingUser || !existingUser.forgotPasswordCode || !existingUser.forgotPasswordCodeValidation) return { success: false, message: 'Something is wrong with the code!' };
-        if (Date.now() - existingUser.forgotPasswordCodeValidation > 5 * 60 * 1000) return { success: false, message: 'Code has been expired!' };
+        if (Date.now() - existingUser.forgotPasswordCodeValidation > 5 * 60 * 1000) return { statusCode: 498, success: false, message: 'Code has been expired!' };
 
         const hashedCode = hmacProcess(code, process.env.HMAC_CODE_SECRET);
         if (hashedCode === existingUser.forgotPasswordCode) {

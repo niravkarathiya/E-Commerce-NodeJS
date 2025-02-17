@@ -178,7 +178,6 @@ class AuthController {
     }
 
     async verifyForgotPasswordCode(req: any, res: Response, next: NextFunction) {
-        console.log(req.user);
         const { email, providedCode, newPassword } = req.body;
         try {
             const result = await authService.verifyForgotPasswordCode(email, providedCode, newPassword);

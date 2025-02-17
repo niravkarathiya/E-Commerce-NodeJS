@@ -34,7 +34,7 @@ class AuthService {
 
             const hashedPassword = await bcrypt.hash(password, 12);
             const newUser = new User({ email, password: hashedPassword, avatar: defaultAvatar, username, verified: false, role: role });
-            const verificationLink = `${process.env.FRONTEND_URL}/verify-email?email=${encodeURIComponent(email)}`;
+            const verificationLink = `${process.env.FRONTEND_URL}/verify-profile?email=${encodeURIComponent(email)}`;
             const emailData = { verificationLink };
 
             return await sendEmail({
@@ -53,12 +53,12 @@ class AuthService {
     async verifyUserEmail(req: any) {
         try {
             const { email } = req.query;
-            if (!email) return { success: false, message: 'Invalid verification link.' };
+            if (!email) throw new Error('Invalid verification link!');
 
             const user = await User.findOne({ email });
-            if (!user) return { success: false, message: 'User not found.' };
+            if (!user) throw new Error('User not found');
 
-            if (user.verified) return { success: false, message: 'User already verified.' };
+            if (user.verified) throw new Error('User already verified!');
 
             user.verified = true;
             await user.save();
@@ -71,11 +71,15 @@ class AuthService {
 
     async loginUser(email: string, password: string) {
         const user = await User.findOne({ email });
+
         const { error } = loginSchema.validate({ email, password });
 
         if (error) throw new Error(error.details[0].message);
 
+        if (!user) throw new Error('User does not exists or Please check the email address!');
+
         if (!user?.verified) throw new Error('You have to verify your account using mail that you have recieved after register!');
+
 
         if (!user || !(await bcrypt.compare(password, user.password))) throw new Error('Invalid email or password');
 

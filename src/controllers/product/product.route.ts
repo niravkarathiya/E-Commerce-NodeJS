@@ -10,7 +10,7 @@ const productRoute = Router();
 productRoute.post('/create', [loggedIn, isAdmin], productController.createProduct);
 
 // Fetch all products
-productRoute.get('/list', productController.getProducts);
+productRoute.get('/list', loggedIn, productController.getProducts);
 
 // Fetch a single product by its ID
 productRoute.get('/:productId', productController.getProductById);

@@ -23,6 +23,7 @@ import logRequest from './middlewares/log.middleware';
 import errorMiddleware from './middlewares/error.middleware';
 import swaggerUi from "swagger-ui-express";
 import YAML from 'yamljs';
+import cartRoute from './controllers/cart/cart.routes';
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use('/products', productRoute);
 app.use('/review', reviewRoute);
 app.use('/purchase', purchaseRoute);
 app.use('/address', addressRoute);
+app.use('/cart', cartRoute);
 
 app.use(errorMiddleware);
 

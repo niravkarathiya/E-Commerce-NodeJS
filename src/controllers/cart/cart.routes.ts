@@ -5,14 +5,13 @@ import { cartController } from './cart.controller';
 const cartRoute = Router();
 
 // Add product to cart
-cartRoute.post('/add', loggedIn, cartController.addToCart);
-
-// Remove product from cart
-cartRoute.post('/remove', loggedIn, cartController.removeFromCart);
+cartRoute.post('/updateCart', loggedIn, cartController.updateCart);
 
 // Empty the cart
 cartRoute.post('/empty', loggedIn, cartController.emptyCart);
 
+// Remove product from cart
+cartRoute.delete('/remove-product/:productId', loggedIn, cartController.deleteProductFromCart);
 
 // Get cart details
 cartRoute.get('/cart/:userId', cartController.getCartDetails);

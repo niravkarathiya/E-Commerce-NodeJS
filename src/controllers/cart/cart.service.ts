@@ -1,14 +1,20 @@
+import User from "../auth/auth.model";
 import Cart from "./cart.model";
 
 class CartService {
 
     async updateCart(userId: any, productId: any, quantity: any, mode: any) {
         const cart = await Cart.findOne({ userId });
+        const user = await User.findById(userId);
 
         if (!cart) {
             if (mode === 'increment') {
                 const newCart = new Cart({ userId, products: [{ productId, quantity }] });
                 await newCart.save();
+                if (user) {
+                    user.cartCount += 1;
+                    await user.save();
+                }
                 return { message: 'Product added to cart successfully!' };
             }
             return { message: 'Your cart is empty!', status: true, statusCode: 400 };
@@ -21,6 +27,10 @@ class CartService {
                 cart.products[productIndex].quantity += quantity;
             } else {
                 cart.products.push({ productId, quantity });
+                if (user) {
+                    user.cartCount += 1;
+                    await user.save();
+                }
             }
             await cart.save();
             return { message: 'Product added to cart successfully!' };
@@ -33,6 +43,10 @@ class CartService {
                 cart.products[productIndex].quantity -= quantity;
             } else {
                 cart.products.splice(productIndex, 1);
+                if (user) {
+                    user.cartCount = Math.max(0, user.cartCount - 1);
+                    await user.save();
+                }
             }
 
             await cart.save();
@@ -45,6 +59,11 @@ class CartService {
     // Delete a single product from cart
     async deleteProductFromCart(userId: any, productId: any) {
         const cart = await Cart.findOne({ userId });
+        const user = await User.findOne({ _id: userId });
+        if (user) {
+            user.cartCount -= 1;
+            await user.save();
+        }
 
         if (!cart) {
             throw new Error('Cart not found!');
@@ -60,6 +79,11 @@ class CartService {
     // Empty cart
     async emptyCart(userId: any) {
         const cart = await Cart.findOneAndDelete({ userId });
+        const user = await User.findOne({ _id: userId });
+        if (user) {
+            user.cartCount = 0;
+            await user.save();
+        }
         if (!cart) {
             throw new Error('Cart not found!');
         }

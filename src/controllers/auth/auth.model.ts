@@ -49,6 +49,10 @@ const userSchema = new Schema({
     role: {
         type: String,
         enum: ['admin', 'user', 'vendor'],
+    },
+    cartCount: {
+        type: Number,
+        default: 0,
     }
 }, {
     timestamps: true,

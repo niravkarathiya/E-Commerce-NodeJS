@@ -24,7 +24,7 @@ class AuthService {
 
     async registerUserWithEmailVerify(email: string, password: string, username: string, role: string) {
         try {
-            const defaultAvatar = 'https://res.cloudinary.com/dnaaqd8pd/image/upload/v1738935441/user_uploads/v5l5mtycndlbbd9ofsdp.jpg';
+            const defaultAvatar = 'https://res.cloudinary.com/dnaaqd8pd/image/upload/v1739438817/user_uploads/ne8wh7h9bhm2yqcf5s0p.jpg';
 
             const { error } = registerSchema.validate({ email, password, username, role });
             if (error) return ({ message: error.details[0].message, statusCode: 400, status: false });

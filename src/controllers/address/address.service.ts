@@ -27,15 +27,14 @@ class AddressService {
     }
 
     // Fetch all addresses with optional filters, pagination, and sorting
-    async getAddresses(filters = {}, page = 1, limit = 10, sort = {}) {
-        try {
-            const addresses = await Address.find(filters)
-                .populate('userId', 'name email')
-                .skip((page - 1) * limit)
-                .limit(limit)
-                .sort(sort);
+    async getAddresses(page: any, limit: any, userId: string) {
 
-            const totalCount = await Address.countDocuments(filters);
+        try {
+            const addresses = await Address.find({ userId })
+                .skip(page * 5)
+                .limit(5);
+
+            const totalCount = await Address.countDocuments();
             return {
                 addresses,
                 totalCount,

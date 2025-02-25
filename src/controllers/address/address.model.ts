@@ -8,6 +8,16 @@ const addressSchema = new Schema({
         ref: 'User',
         required: [true, 'User ID is required!'],
     },
+    name: {
+        type: String,
+        required: [true, 'Name is required for particular address!'],
+        trim: true,
+    },
+    phone: {
+        type: String,
+        required: [true, 'Phone number is required!'],
+        trim: true,
+    },
     houseNo: {
         type: String,
         required: [true, 'House number is required!'],

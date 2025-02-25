@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { addressService } from './address.service';
-import { Error } from 'mongoose';
 
 class AddressController {
 
@@ -43,10 +42,10 @@ class AddressController {
     }
 
     // Get all addresses with optional filters
-    async getAddresses(req: Request, res: Response) {
-        const { page = 1, limit = 10, sort = '{}' } = req.query;
+    async getAddresses(req: any, res: Response) {
+        const { page, limit, userId = req.user._id } = req.query;
         try {
-            const addresses = await addressService.getAddresses({}, Number(page), Number(limit), JSON.parse(sort as string));
+            const addresses = await addressService.getAddresses(Number(page), Number(limit), userId);
             res.json({
                 statusCode: 200,
                 message: 'Addresses fetched successfully',
@@ -66,6 +65,7 @@ class AddressController {
     async updateAddress(req: Request, res: Response) {
         try {
             const updatedAddress = await addressService.updateAddress(req.params.id, req.body);
+            console.log('req.params.id: ', req.params.id);
             res.json({
                 statusCode: 200,
                 message: 'Address updated successfully',

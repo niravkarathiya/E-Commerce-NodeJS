@@ -53,6 +53,10 @@ const userSchema = new Schema({
     cartCount: {
         type: Number,
         default: 0,
+    },
+    phone: {
+        type: String,
+        required: [true, "Phone number is required!"]
     }
 }, {
     timestamps: true,

@@ -99,6 +99,24 @@ class AddressController {
             });
         }
     }
+
+    // Set default address
+    async setDefaultAddress(req: Request, res: Response) {
+        try {
+            const address = await addressService.setDefaultAddress(req.params.id);
+            res.json({
+                statusCode: address.statusCode,
+                message: address.message,
+                status: true,
+            });
+        } catch (error: any) {
+            res.json({
+                statusCode: 404,
+                message: error.message || 'Address not found',
+                status: false,
+            });
+        }
+    }
 }
 
 export const addressController = new AddressController();

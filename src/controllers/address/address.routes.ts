@@ -20,4 +20,7 @@ addressRoute.patch('/:id', loggedIn, addressController.updateAddress);
 // Delete an address by its ID
 addressRoute.delete('/:id', loggedIn, addressController.deleteAddress);
 
+// Set default address
+addressRoute.get('/set-default/:id', loggedIn, addressController.setDefaultAddress);
+
 export default addressRoute;

@@ -68,6 +68,10 @@ const addressSchema = new Schema({
         trim: true,
         match: [/^\d{5,6}$/, 'Pincode must be a valid 5 or 6-digit number!'],
     },
+    isDefault: {
+        type: Boolean,
+        default: false,
+    }
 }, {
     timestamps: true,
 });

@@ -76,6 +76,28 @@ class AddressService {
             throw new Error(`Error deleting address: ${error.message}`);
         }
     }
+
+    // Set default address 
+    async setDefaultAddress(addressId: any) {
+        try {
+            // Find the address by ID
+            const address = await Address.findById(addressId).populate('userId', 'name email');
+            if (!address) {
+                throw new Error('Address not found!');
+            }
+
+            // Update all addresses of the user to set isDefault as false
+            await Address.updateMany({ userId: address.userId }, { isDefault: false });
+
+            // Set the selected address as default
+            address.isDefault = true;
+            await address.save();
+
+            return { message: 'Address set as default successfully!', statusCode: 200 };
+        } catch (error: any) {
+            throw new Error(`Error setting default address: ${error.message}`);
+        }
+    }
 }
 
 export const addressService = new AddressService();
